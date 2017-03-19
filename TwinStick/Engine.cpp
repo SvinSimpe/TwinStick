@@ -13,8 +13,22 @@ LRESULT CALLBACK MainWndProc( HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam 
 bool Engine::Update( float deltaTime )
 {
 	// Update Systems
+	if( !mGraphicSystem->Update( deltaTime, mActors ) )
+		return false;
 
-	return false;
+	return true;
+
+}
+
+bool Engine::InitializeSystems()
+{
+
+	mGraphicSystem = std::make_unique<GraphicSystem>();
+	if( mGraphicSystem->Initialize( mHWnd ) )
+		return false;
+
+	return true;
+
 }
 
 LRESULT CALLBACK Engine::WndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
@@ -48,9 +62,12 @@ Engine::Engine()
 {
 	mHInstance	= nullptr;
 	mHWnd		= nullptr;
+
+	mGraphicSystem = nullptr;
 	
 	size_t width = Resolution::SCREEN_WIDTH;
 }
+
 
 Engine::~Engine()
 {}
@@ -99,6 +116,10 @@ bool Engine::Initialize( HINSTANCE hInstance, int nCmdShow )
 
 	ShowWindow( mHWnd, nCmdShow );
 	ShowCursor( TRUE );
+
+
+	if( InitializeSystems() )
+		return false;
 
 	return true;
 }
