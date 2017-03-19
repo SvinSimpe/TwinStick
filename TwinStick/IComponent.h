@@ -1,9 +1,11 @@
 #pragma once
 
 #include <memory>
+
 #if _DEBUG
 	#include <iostream>
 #endif
+
 #include "EComponentType.h"
 
 
