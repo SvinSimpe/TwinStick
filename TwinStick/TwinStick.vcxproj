@@ -111,12 +111,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CameraSystem.cpp" />
     <ClCompile Include="Engine.cpp" />
     <ClCompile Include="GraphicSystem.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ActorCollection.h" />
     <ClInclude Include="CameraComponent.h" />
+    <ClInclude Include="CameraSystem.h" />
     <ClInclude Include="EComponentType.h" />
     <ClInclude Include="Engine.h" />
     <ClInclude Include="GraphicSystem.h" />

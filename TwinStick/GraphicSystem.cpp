@@ -184,7 +184,8 @@ bool GraphicSystem::Initialize( HWND& windowHandle )
 
 }
 
-bool GraphicSystem::Update( float deltaTime, ActorCollection& actors )
+
+bool GraphicSystem::Update( float deltaTime, std::unique_ptr<ActorCollection>& actors )
 {
 
 	if( !Render() )

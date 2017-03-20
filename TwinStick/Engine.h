@@ -3,11 +3,11 @@
 #include <Windows.h>
 #include "GraphicSystem.h"
 #include <memory>
+#include <vector>
 
-struct ActorCollection
-{
+#include "ActorCollection.h"
 
-};
+
 
 class Engine
 {
@@ -15,7 +15,7 @@ class Engine
 		HINSTANCE	mHInstance;
 		HWND		mHWnd;
 
-		ActorCollection mActors;
+		std::unique_ptr<ActorCollection> mActors;
 
 		// Systems
 		std::unique_ptr<GraphicSystem> mGraphicSystem;

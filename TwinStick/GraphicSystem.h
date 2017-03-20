@@ -1,4 +1,5 @@
-#pragma once
+//#pragma once
+
 
 #include "ISystems.h"
 #include <wrl.h>
@@ -31,5 +32,5 @@ class GraphicSystem : public ISystems
 		bool Initialize( HWND& windowHandle ) ;
 		
 		// Inherited via ISystems 
-		virtual bool Update( float deltaTime, ActorCollection& actors ) override;
+		virtual bool Update( float deltaTime, std::unique_ptr<ActorCollection>& actors ) override;
 };
