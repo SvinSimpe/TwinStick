@@ -12,4 +12,5 @@
 __interface IComponent
 {
 	virtual const EComponentType GetType() const = 0;
+
 };

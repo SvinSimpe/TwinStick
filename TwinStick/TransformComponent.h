@@ -5,13 +5,13 @@
 using namespace DirectX;
 struct TransformComponent : public IComponent
 {
-	XMFLOAT3	location	= XMFLOAT3( 0.0f, 0.0f, 0.0f );
-	XMFLOAT3	rotation	= XMFLOAT3( 0.0f, 0.0f, 0.0f );
-	XMFLOAT3	scale		= XMFLOAT3( 0.0f, 0.0f, 0.0f );
+	XMFLOAT3	location	= XMFLOAT3();
+	XMFLOAT3	rotation	= XMFLOAT3();
+	XMFLOAT3	scale		= XMFLOAT3();
 	bool		isDirty		= false;
 
-	TransformComponent( XMFLOAT3 initialLocation = XMFLOAT3( 0.0f, 0.0f, 0.0f ),
-						XMFLOAT3 initialRotation = XMFLOAT3( 0.0f, 0.0f, 0.0f ),
+	TransformComponent( XMFLOAT3 initialLocation = XMFLOAT3(),
+						XMFLOAT3 initialRotation = XMFLOAT3(),
 						XMFLOAT3 initialScale = XMFLOAT3( 1.0f, 1.0f, 1.0f ) )
 	{
 		location	= initialLocation;

@@ -8,7 +8,8 @@ enum class EComponentType : std::uint32_t
 	Transform	= 1 << 0,
 	Movement	= 1 << 1,
 	Collider	= 1 << 2,
-	Render		= 1 << 3
+	Render		= 1 << 3,
+	Camera		= 1 << 4
 
 };
 
