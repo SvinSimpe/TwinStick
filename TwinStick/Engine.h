@@ -1,13 +1,16 @@
 #pragma once
 
 #include <Windows.h>
-#include "GraphicSystem.h"
+
 #include <memory>
+#include <vector>
 
-struct ActorCollection
-{
+#include "ActorCollection.h"
 
-};
+#include "GraphicSystem.h"
+#include "CameraSystem.h"
+
+
 
 class Engine
 {
@@ -15,14 +18,18 @@ class Engine
 		HINSTANCE	mHInstance;
 		HWND		mHWnd;
 
-		ActorCollection mActors;
+		std::unique_ptr<ActorCollection>	mActors;
+		unsigned int						mNumActiveActors;
 
 		// Systems
-		std::unique_ptr<GraphicSystem> mGraphicSystem;
+		std::unique_ptr<GraphicSystem>	mGraphicSystem;
+		std::unique_ptr<CameraSystem>	mCameraSystem;
+
 
 	private:
 		bool Update( float deltaTime );
 		bool InitializeSystems();
+		void CheckInactiveActors();
 
 
 	public:
@@ -33,5 +40,7 @@ class Engine
 
 		bool Initialize( HINSTANCE hInstance, int nCmdShow );
 		int Run();
+
+		const bool RequestActor( std::vector<std::unique_ptr<IComponent>>& componentList );
 
 };

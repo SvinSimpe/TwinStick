@@ -12,9 +12,16 @@ LRESULT CALLBACK MainWndProc( HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam 
 
 bool Engine::Update( float deltaTime )
 {
+	CheckInactiveActors();
+
 	// Update Systems
-	if( !mGraphicSystem->Update( deltaTime, mActors ) )
+	//if( !mCameraSystem->Update( deltaTime, mActors, mNumActiveActors ) )
+	//	return false;
+
+	if( !mGraphicSystem->Update( deltaTime, mActors, mNumActiveActors ) )
 		return false;
+
+	
 
 	return true;
 
@@ -24,10 +31,32 @@ bool Engine::InitializeSystems()
 {
 
 	mGraphicSystem = std::make_unique<GraphicSystem>();
-	if( mGraphicSystem->Initialize( mHWnd ) )
+	if( !mGraphicSystem->Initialize( mHWnd ) )
+		return false;
+
+	mCameraSystem = std::make_unique<CameraSystem>();
+	if( !mCameraSystem->Initialize() )
 		return false;
 
 	return true;
+
+}
+
+void Engine::CheckInactiveActors()
+{
+	for( size_t i = 0; i < mNumActiveActors; i++ )
+	{
+		if( !mActors->mIsActive[i] )
+		{
+			std::swap( mActors->mIsActive[i], mActors->mIsActive[mNumActiveActors] );
+			std::swap( mActors->componentMasks[i], mActors->componentMasks[mNumActiveActors] );
+			mActors->mTransformComponents[i].swap( mActors->mTransformComponents[mNumActiveActors] );
+			mActors->mCameraComponents[i].swap( mActors->mCameraComponents[mNumActiveActors] );
+
+			mNumActiveActors--;
+
+		}
+	}
 
 }
 
@@ -63,9 +92,11 @@ Engine::Engine()
 	mHInstance	= nullptr;
 	mHWnd		= nullptr;
 
-	mGraphicSystem = nullptr;
-	
-	size_t width = Resolution::SCREEN_WIDTH;
+	mActors				= nullptr;
+	mNumActiveActors	= 0;
+
+	mGraphicSystem	= nullptr;
+	mCameraSystem	= nullptr;
 }
 
 
@@ -118,7 +149,7 @@ bool Engine::Initialize( HINSTANCE hInstance, int nCmdShow )
 	ShowCursor( TRUE );
 
 
-	if( InitializeSystems() )
+	if( !InitializeSystems() )
 		return false;
 
 	return true;
@@ -162,4 +193,43 @@ int Engine::Run()
 
 	return static_cast<int>( msg.wParam );
 
+}
+
+const bool Engine::RequestActor( std::vector<std::unique_ptr<IComponent>>& componentList )
+{
+	if( !componentList.empty() )
+	{
+		if( mNumActiveActors < MAX_ACTORS )
+		{
+			const size_t& i = mNumActiveActors;
+			mActors->mIsActive[i] = true;
+
+			// Set Components
+			for( auto& component : componentList )
+			{
+				switch( component->GetType() )
+				{
+					case EComponentType::Transform :
+					{
+						if( mActors->mTransformComponents[mNumActiveActors]->Set( component ) )
+						{
+							mActors->componentMasks[i] = static_cast<size_t>( 
+								mActors->componentMasks[i] | EComponentType::Transform );
+						}
+						break;
+					}
+					case EComponentType::Camera :
+					{
+						break;
+					}
+					default:
+						break;
+				}
+			}
+			mNumActiveActors++;
+
+		}
+	}
+
+	return true;
 }
