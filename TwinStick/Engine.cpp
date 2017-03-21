@@ -13,6 +13,9 @@ LRESULT CALLBACK MainWndProc( HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam 
 bool Engine::Update( float deltaTime )
 {
 	// Update Systems
+	//if( !mCameraSystem->Update( deltaTime, mActors ) )
+	//	return false;
+
 	if( !mGraphicSystem->Update( deltaTime, mActors ) )
 		return false;
 
@@ -24,7 +27,11 @@ bool Engine::InitializeSystems()
 {
 
 	mGraphicSystem = std::make_unique<GraphicSystem>();
-	if( mGraphicSystem->Initialize( mHWnd ) )
+	if( !mGraphicSystem->Initialize( mHWnd ) )
+		return false;
+
+	mCameraSystem = std::make_unique<CameraSystem>();
+	if( !mCameraSystem->Initialize() )
 		return false;
 
 	return true;
@@ -62,6 +69,9 @@ Engine::Engine()
 {
 	mHInstance	= nullptr;
 	mHWnd		= nullptr;
+
+	mActors				= nullptr;
+	mNumActiveActors	= 0;
 
 	mGraphicSystem = nullptr;
 	
@@ -118,7 +128,7 @@ bool Engine::Initialize( HINSTANCE hInstance, int nCmdShow )
 	ShowCursor( TRUE );
 
 
-	if( InitializeSystems() )
+	if( !InitializeSystems() )
 		return false;
 
 	return true;

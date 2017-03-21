@@ -10,6 +10,7 @@ struct CameraComponent : public IComponent
 	XMFLOAT3 mFocusPoint	= XMFLOAT3();
 	XMFLOAT3 mUpVector		= XMFLOAT3();
 	XMFLOAT3 mRightVector	= XMFLOAT3();
+	XMFLOAT3 mLookVector	= XMFLOAT3();
 
 	XMFLOAT4X4	mViewMatrix			= XMFLOAT4X4();
 	XMFLOAT4X4	mProjectionMatrix	= XMFLOAT4X4();

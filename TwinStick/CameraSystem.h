@@ -4,12 +4,13 @@
 
 class CameraSystem : public ISystems
 {
+	public:
+		CameraSystem();
+		~CameraSystem();
 
-	CameraSystem();
-	~CameraSystem();
+		bool Initialize();
 
-
-	// Inherited via ISystems
-	virtual bool Update( float deltaTime, std::unique_ptr<ActorCollection>& actors ) override;
+		// Inherited via ISystems
+		virtual bool Update( float deltaTime, std::unique_ptr<ActorCollection>& actors ) override;
 
 };

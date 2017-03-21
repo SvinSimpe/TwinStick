@@ -5,6 +5,7 @@
 #include <wrl.h>
 #include "stdafx.h"
 
+
 class GraphicSystem : public ISystems
 {
 	private:

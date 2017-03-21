@@ -1,11 +1,14 @@
 #pragma once
 
 #include <Windows.h>
-#include "GraphicSystem.h"
+
 #include <memory>
 #include <vector>
 
 #include "ActorCollection.h"
+
+#include "GraphicSystem.h"
+#include "CameraSystem.h"
 
 
 
@@ -16,9 +19,11 @@ class Engine
 		HWND		mHWnd;
 
 		std::unique_ptr<ActorCollection> mActors;
+		unsigned int mNumActiveActors;
 
 		// Systems
 		std::unique_ptr<GraphicSystem> mGraphicSystem;
+		std::unique_ptr<CameraSystem> mCameraSystem;
 
 	private:
 		bool Update( float deltaTime );
