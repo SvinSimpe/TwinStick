@@ -16,28 +16,14 @@ bool CameraSystem::Initialize()
 	return true;
 }
 
-bool CameraSystem::Update( float deltaTime, std::unique_ptr<ActorCollection>& actors )
+bool CameraSystem::Update( float deltaTime, std::unique_ptr<ActorCollection>& actors, size_t numActiveActor )
 {
-	//for( auto&& mask : actors->componentMasks )
-	//{
-	//	if( ( mask & CAMERA_MASK ) == CAMERA_MASK )
-	//	{
-	//		// Update Actor Camera Component
-
-
-	//	}
-	//}
-
-
-
-
-
-	for( size_t i = 0; i < MAX_ACTORS; i++ )
+	for( size_t i = 0; i < numActiveActor; i++ )
 	{
 		if( actors->mIsActive[i] && ( actors->componentMasks[i] & CAMERA_MASK ) == CAMERA_MASK )
 		{
 			std::unique_ptr<CameraComponent>& camComp = actors->mCameraComponents[i];
-			
+
 			XMVECTOR L = XMVectorZero();
 			if( IsVector3Zero( camComp->mLookVector ) )
 			{ 
@@ -46,8 +32,8 @@ bool CameraSystem::Update( float deltaTime, std::unique_ptr<ActorCollection>& ac
 			}
 			else
 				L = XMLoadFloat3( &camComp->mLookVector );
-			
-			
+
+
 			// Update View Matrix
 			XMVECTOR R = XMLoadFloat3( &camComp->mRightVector );
 			XMVECTOR U = XMLoadFloat3( &camComp->mUpVector );

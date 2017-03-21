@@ -21,7 +21,7 @@ inline EComponentType operator|( EComponentType lhs, EComponentType rhs )
 
 }
 
-inline EComponentType operator|( unsigned int lhs, EComponentType rhs )
+inline EComponentType operator|( size_t lhs, EComponentType rhs )
 {
 	return static_cast<EComponentType>( static_cast<T>( lhs ) | static_cast<T>( rhs ) );
 
@@ -34,7 +34,7 @@ inline EComponentType operator&( EComponentType lhs, EComponentType rhs )
 
 }
 
-inline EComponentType operator&( unsigned int lhs, EComponentType rhs )
+inline EComponentType operator&( size_t lhs, EComponentType rhs )
 {
 	return static_cast<EComponentType>( static_cast<T>(lhs) & static_cast<T>( rhs ) );
 

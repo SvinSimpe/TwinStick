@@ -6,6 +6,8 @@ struct ActorCollection;
 
 __interface ISystems
 {
-	virtual bool Update( float deltaTime, std::unique_ptr<ActorCollection>& actors ) = 0;
+	virtual bool Update( float deltaTime, 
+						 std::unique_ptr<ActorCollection>& actors,
+						 size_t numActiveActor) = 0;
 
 };

@@ -10,7 +10,8 @@ class CameraSystem : public ISystems
 
 		bool Initialize();
 
+
 		// Inherited via ISystems
-		virtual bool Update( float deltaTime, std::unique_ptr<ActorCollection>& actors ) override;
+		virtual bool Update( float deltaTime, std::unique_ptr<ActorCollection>& actors, size_t numActiveActor ) override;
 
 };

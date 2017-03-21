@@ -28,4 +28,28 @@ struct CameraComponent : public IComponent
 
 	}
 
+	virtual const bool Set( const std::unique_ptr<IComponent>& newData )
+	{
+		try
+		{
+			CameraComponent& newCamera = dynamic_cast<CameraComponent&>( *newData );
+
+			mFocusPoint		= newCamera.mFocusPoint;
+			mUpVector		= newCamera.mUpVector;
+			mRightVector	= newCamera.mRightVector;
+			mLookVector		= newCamera.mLookVector;
+
+		}
+		catch( const std::exception& exc )
+		{
+			std::cerr << "Error occurred: " << exc.what() << std::endl;
+			return false;
+
+		}
+
+
+		return true;
+
+	}
+
 };

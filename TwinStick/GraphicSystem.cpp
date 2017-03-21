@@ -67,12 +67,6 @@ GraphicSystem::GraphicSystem()
 
 }
 
-GraphicSystem::GraphicSystem( HWND& windowHandle )
-{
-	mWindowHandle = windowHandle;
-
-
-}
 
 GraphicSystem::~GraphicSystem()
 {}
@@ -185,7 +179,8 @@ bool GraphicSystem::Initialize( HWND& windowHandle )
 }
 
 
-bool GraphicSystem::Update( float deltaTime, std::unique_ptr<ActorCollection>& actors )
+
+bool GraphicSystem::Update( float deltaTime, std::unique_ptr<ActorCollection>& actors, size_t numActiveActor )
 {
 
 	if( !Render() )

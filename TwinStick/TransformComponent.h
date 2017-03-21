@@ -30,4 +30,28 @@ struct TransformComponent : public IComponent
 
 	}
 
+	virtual const bool Set( const std::unique_ptr<IComponent>& newData )
+	{
+		try
+		{
+			TransformComponent& newTransform = dynamic_cast<TransformComponent&>( *newData );
+
+			location	= newTransform.location;
+			rotation	= newTransform.rotation;
+			scale		= newTransform.scale;
+			isDirty		= true;
+
+		}
+		catch( const std::exception& exc )
+		{
+			std::cerr << "Error occurred: " << exc.what() << std::endl;
+			return false;
+
+		}
+
+
+		return true;
+
+	}
+
 };

@@ -28,10 +28,10 @@ class GraphicSystem : public ISystems
 
 	public:
 		GraphicSystem();
-		GraphicSystem( HWND& windowHandle );
 		~GraphicSystem();
 		bool Initialize( HWND& windowHandle ) ;
 		
-		// Inherited via ISystems 
-		virtual bool Update( float deltaTime, std::unique_ptr<ActorCollection>& actors ) override;
+
+		// Inherited via ISystems
+		virtual bool Update( float deltaTime, std::unique_ptr<ActorCollection>& actors, size_t numActiveActor ) override;
 };
