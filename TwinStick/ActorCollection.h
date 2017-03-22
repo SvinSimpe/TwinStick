@@ -6,8 +6,6 @@
 #include "TransformComponent.h"
 #include "CameraComponent.h"
 
-#define MAX_ACTORS 256
-
 struct ActorCollection
 {
 	std::vector<bool>	mIsActive;

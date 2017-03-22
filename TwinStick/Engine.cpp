@@ -42,6 +42,26 @@ bool Engine::InitializeSystems()
 
 }
 
+void Engine::InitializeActors()
+{
+	mActors = std::make_unique<ActorCollection>();
+
+	for( size_t i = 0; i < GameGlobals::MAX_ACTORS; i++ )
+	{
+		mActors->mIsActive.push_back( false );
+		mActors->componentMasks.push_back( 0 );
+		mActors->mTransformComponents.push_back( std::make_unique<TransformComponent>() );
+		mActors->mCameraComponents.push_back( std::make_unique<CameraComponent>() );
+
+	}
+
+	mActors->mIsActive.resize( GameGlobals::MAX_ACTORS );
+	mActors->componentMasks.resize( GameGlobals::MAX_ACTORS );
+	mActors->mTransformComponents.resize( GameGlobals::MAX_ACTORS );
+	mActors->mCameraComponents.resize( GameGlobals::MAX_ACTORS );
+
+}
+
 void Engine::CheckInactiveActors()
 {
 	for( size_t i = 0; i < mNumActiveActors; i++ )
@@ -152,6 +172,8 @@ bool Engine::Initialize( HINSTANCE hInstance, int nCmdShow )
 	if( !InitializeSystems() )
 		return false;
 
+	InitializeActors();
+
 	return true;
 }
 
@@ -199,7 +221,7 @@ const bool Engine::RequestActor( std::vector<std::unique_ptr<IComponent>>& compo
 {
 	if( !componentList.empty() )
 	{
-		if( mNumActiveActors < MAX_ACTORS )
+		if( mNumActiveActors < GameGlobals::MAX_ACTORS )
 		{
 			const size_t& i = mNumActiveActors;
 			mActors->mIsActive[i] = true;

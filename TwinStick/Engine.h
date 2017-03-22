@@ -29,7 +29,9 @@ class Engine
 	private:
 		bool Update( float deltaTime );
 		bool InitializeSystems();
+		void InitializeActors();
 		void CheckInactiveActors();
+
 
 
 	public:

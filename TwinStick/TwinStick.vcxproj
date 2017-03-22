@@ -120,6 +120,9 @@
     <ClInclude Include="ActorCollection.h" />
     <ClInclude Include="CameraComponent.h" />
     <ClInclude Include="CameraSystem.h" />
+    <ClInclude Include="CBufferData.h" />
+    <ClInclude Include="CubeMesh.h" />
+    <ClInclude Include="EBufferType.h" />
     <ClInclude Include="EComponentType.h" />
     <ClInclude Include="Engine.h" />
     <ClInclude Include="GraphicSystem.h" />

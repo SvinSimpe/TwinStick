@@ -22,6 +22,9 @@
     <Filter Include="Header Files\Components">
       <UniqueIdentifier>{c73d53fd-2064-4d30-ad96-dc80fdee470e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Geometry">
+      <UniqueIdentifier>{033feb8a-5309-46cd-8835-99d069a208d2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -69,6 +72,15 @@
       <Filter>Header Files\Systems</Filter>
     </ClInclude>
     <ClInclude Include="ActorCollection.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CubeMesh.h">
+      <Filter>Header Files\Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="EBufferType.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CBufferData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

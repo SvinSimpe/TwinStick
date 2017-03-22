@@ -1,80 +1,14 @@
 #include "GraphicSystem.h"
 #include "Utility.h"
 #include <DirectXColors.h>
+#include "CBufferData.h"
 
 using namespace DirectX;;
 using Microsoft::WRL::ComPtr;
 
-void GraphicSystem::BeginFrame()
+
+bool GraphicSystem::InitializeDirectXComponents()
 {
-	mDeviceContext->ClearDepthStencilView( mDepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0 );
-	mDeviceContext->ClearRenderTargetView( mRenderTargetView.Get(), Colors::PaleVioletRed );
-	mDeviceContext->OMSetRenderTargets( 1, mRenderTargetView.GetAddressOf(), mDepthStencilView.Get() );
-
-}
-
-void GraphicSystem::EndFrame()
-{
-	// Swap Front and Back Buffer
-	mSwapChain->Present( 0, 0 );
-	mDeviceContext->ClearState();
-
-}
-
-bool GraphicSystem::Render()
-{
-	BeginFrame();
-
-	// Render Components;
-
-	EndFrame();
-	return true;
-	
-}
-
-void GraphicSystem::SetViewport()
-{
-	RECT rc;
-	GetClientRect( mWindowHandle, &rc );
-
-	int width	= ( rc.right - rc.left );
-	int height	= ( rc.bottom - rc.top );
-
-	D3D11_VIEWPORT vp;
-	vp.Width	= Resolution::SCREEN_WIDTH;
-	vp.Height	= Resolution::SCREEN_HEIGHT;
-	vp.MinDepth	= 0.0f;
-	vp.MaxDepth	= 1.0f;
-	vp.TopLeftX	= 0;
-	vp.TopLeftY	= 0;
-
-	mDeviceContext->RSSetViewports( 1, &vp );
-	mDeviceContext->OMSetRenderTargets( 1, mRenderTargetView.GetAddressOf(), mDepthStencilView.Get() );
-
-}
-
-GraphicSystem::GraphicSystem()
-{
-	mWindowHandle		= NULL;
-
-	mDevice				= nullptr;
-	mDeviceContext		= nullptr;
-	mSwapChain			= nullptr;
-	mRenderTargetView	= nullptr;
-	mDepthStencilView	= nullptr;
-	mRasterizerState	= nullptr;
-	mSamplerState		= nullptr;
-
-}
-
-
-GraphicSystem::~GraphicSystem()
-{}
-
-bool GraphicSystem::Initialize( HWND& windowHandle )
-{
-	mWindowHandle = windowHandle;
-
 	RECT rc;
 	GetWindowRect( mWindowHandle, &rc );
 
@@ -173,6 +107,156 @@ bool GraphicSystem::Initialize( HWND& windowHandle )
 		return hr;
 
 	SetViewport();
+
+	return true;
+}
+
+void GraphicSystem::BeginFrame()
+{
+	mDeviceContext->ClearDepthStencilView( mDepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0 );
+	mDeviceContext->ClearRenderTargetView( mRenderTargetView.Get(), Colors::PaleVioletRed );
+	mDeviceContext->OMSetRenderTargets( 1, mRenderTargetView.GetAddressOf(), mDepthStencilView.Get() );
+
+}
+
+void GraphicSystem::EndFrame()
+{
+	// Swap Front and Back Buffer
+	mSwapChain->Present( 0, 0 );
+	mDeviceContext->ClearState();
+
+}
+
+bool GraphicSystem::Render()
+{
+	BeginFrame();
+
+	// Render Components;
+
+	EndFrame();
+	return true;
+	
+}
+
+void GraphicSystem::SetViewport()
+{
+	RECT rc;
+	GetClientRect( mWindowHandle, &rc );
+
+	int width	= ( rc.right - rc.left );
+	int height	= ( rc.bottom - rc.top );
+
+	D3D11_VIEWPORT vp;
+	vp.Width	= Resolution::SCREEN_WIDTH;
+	vp.Height	= Resolution::SCREEN_HEIGHT;
+	vp.MinDepth	= 0.0f;
+	vp.MaxDepth	= 1.0f;
+	vp.TopLeftX	= 0;
+	vp.TopLeftY	= 0;
+
+	mDeviceContext->RSSetViewports( 1, &vp );
+	mDeviceContext->OMSetRenderTargets( 1, mRenderTargetView.GetAddressOf(), mDepthStencilView.Get() );
+
+}
+
+bool GraphicSystem::BuildMeshVBuffer()
+{
+	D3D11_BUFFER_DESC vbd;
+	vbd.ByteWidth			= sizeof(Vertex32) * static_cast<UINT>( mCubeMesh->vertices.size() );
+	vbd.StructureByteStride = sizeof(Vertex32);
+	vbd.Usage				= D3D11_USAGE_IMMUTABLE;
+	vbd.BindFlags			= D3D11_BIND_VERTEX_BUFFER;
+	vbd.CPUAccessFlags		= 0;
+	vbd.MiscFlags			= 0;
+
+
+	D3D11_SUBRESOURCE_DATA vinitData;
+	vinitData.SysMemPitch		= 0;
+	vinitData.SysMemSlicePitch	= 0;
+	//vinitData.pSysMem			= &data[0];
+	vinitData.pSysMem = &mCubeMesh->vertices;
+
+	if( FAILED( mDevice->CreateBuffer( &vbd, &vinitData,
+									   mBuffers[static_cast<size_t>(EBufferType::Vertex)].GetAddressOf() ) ) )
+		return false;
+
+	return true;
+}
+
+bool GraphicSystem::BuildFrameCBuffer()
+{
+	D3D11_BUFFER_DESC cbDesc;
+	cbDesc.ByteWidth			= sizeof( FrameData );
+	cbDesc.Usage				= D3D11_USAGE_DYNAMIC;
+	cbDesc.BindFlags			= D3D11_BIND_CONSTANT_BUFFER;
+	cbDesc.CPUAccessFlags		= D3D11_CPU_ACCESS_WRITE;
+	cbDesc.MiscFlags			= 0;
+	cbDesc.StructureByteStride	= 0;
+
+	if( FAILED ( mDevice->CreateBuffer( &cbDesc, nullptr,
+										mBuffers[static_cast<size_t>(EBufferType::Frame)].GetAddressOf() ) ) )
+		return false;
+
+	return true;
+}
+
+bool GraphicSystem::BuildInstanceCBuffer()
+{
+	D3D11_BUFFER_DESC ibDesc;
+	ibDesc.ByteWidth			= sizeof( InstanceData ) * GameGlobals::MAX_ACTORS;
+	ibDesc.Usage				= D3D11_USAGE_DYNAMIC;
+	ibDesc.BindFlags			= D3D11_BIND_VERTEX_BUFFER;
+	ibDesc.CPUAccessFlags		= D3D11_CPU_ACCESS_WRITE;
+	ibDesc.MiscFlags			= 0;
+	ibDesc.StructureByteStride	= 0;
+
+	if( FAILED( mDevice->CreateBuffer( &ibDesc, nullptr,
+									   mBuffers[static_cast<size_t>(EBufferType::Instance)].GetAddressOf() ) ) )
+		return false;
+
+	return true;
+}
+
+GraphicSystem::GraphicSystem()
+{
+	mWindowHandle		= NULL;
+
+	mDevice				= nullptr;
+	mDeviceContext		= nullptr;
+	mSwapChain			= nullptr;
+	mRenderTargetView	= nullptr;
+	mDepthStencilView	= nullptr;
+	mRasterizerState	= nullptr;
+	mSamplerState		= nullptr;
+
+	for( size_t i = 0; i < static_cast<size_t>(EBufferType::NumBufferTypes); i++ )
+		mBuffers.push_back( nullptr );
+
+	mCubeMesh			= nullptr;
+}
+
+
+GraphicSystem::~GraphicSystem()
+{}
+
+bool GraphicSystem::Initialize( HWND& windowHandle )
+{
+	mWindowHandle = windowHandle;
+
+	if( !InitializeDirectXComponents() )
+		return false;
+
+	mCubeMesh = std::make_unique<CubeMesh>();
+
+	if( !BuildMeshVBuffer() )
+		return false;
+
+	if( !BuildFrameCBuffer() )
+		return false;
+
+	if( !BuildInstanceCBuffer() )
+		return false;
+
 
 	return true;
 

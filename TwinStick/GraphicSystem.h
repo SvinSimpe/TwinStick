@@ -1,10 +1,14 @@
 //#pragma once
 
 
-#include "ISystems.h"
+
 #include <wrl.h>
 #include "stdafx.h"
 
+#include "ISystems.h"
+#include "CubeMesh.h"
+
+#include "EBufferType.h"
 
 class GraphicSystem : public ISystems
 {
@@ -18,13 +22,23 @@ class GraphicSystem : public ISystems
 		Microsoft::WRL::ComPtr<ID3D11DepthStencilView>	mDepthStencilView;
 		Microsoft::WRL::ComPtr<ID3D11RasterizerState>	mRasterizerState;
 		Microsoft::WRL::ComPtr<ID3D11SamplerState>		mSamplerState;
+		
+		std::vector<Microsoft::WRL::ComPtr<ID3D11Buffer>> mBuffers;
 
+
+		std::unique_ptr<CubeMesh>	mCubeMesh;
 
 	private:
+		bool InitializeDirectXComponents();
+
 		void BeginFrame();
 		void EndFrame();
 		bool Render();
 		void SetViewport();
+
+		bool BuildMeshVBuffer();
+		bool BuildFrameCBuffer();
+		bool BuildInstanceCBuffer();
 
 	public:
 		GraphicSystem();
