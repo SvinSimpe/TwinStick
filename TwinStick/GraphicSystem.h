@@ -23,6 +23,10 @@ class GraphicSystem : public ISystems
 		Microsoft::WRL::ComPtr<ID3D11RasterizerState>	mRasterizerState;
 		Microsoft::WRL::ComPtr<ID3D11SamplerState>		mSamplerState;
 		
+		Microsoft::WRL::ComPtr<ID3D11VertexShader>		mVertexShader;
+		Microsoft::WRL::ComPtr<ID3D11PixelShader>		mPixelShader;
+		Microsoft::WRL::ComPtr<ID3D11InputLayout>		mInputLayout;
+
 		std::vector<Microsoft::WRL::ComPtr<ID3D11Buffer>> mBuffers;
 
 
@@ -30,6 +34,8 @@ class GraphicSystem : public ISystems
 
 	private:
 		bool InitializeDirectXComponents();
+		bool InitializeShaders();
+		bool CompileShader( char* shaderFile, char* pEntrypoint, char* pTarget, D3D10_SHADER_MACRO* pDefines, ID3DBlob** pCompiledShader );
 
 		void BeginFrame();
 		void EndFrame();

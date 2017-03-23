@@ -3,7 +3,13 @@
 #include <DirectXColors.h>
 #include "CBufferData.h"
 
-using namespace DirectX;;
+#pragma comment( lib, "d3dcompiler.lib" )
+#include <d3dcompiler.h>
+#include <fstream>
+
+
+
+using namespace DirectX;
 using Microsoft::WRL::ComPtr;
 
 #define GRAPHIC_MASK ( EComponentType::Transform | EComponentType::Mesh )
@@ -112,12 +118,106 @@ bool GraphicSystem::InitializeDirectXComponents()
 	return true;
 }
 
+bool GraphicSystem::InitializeShaders()
+{
+	// Compile Vertex Shader
+	ComPtr<ID3DBlob> vs = nullptr;
+	if ( CompileShader( "Shader.hlsl", "VertexShaderMain", "vs_5_0", nullptr, vs.GetAddressOf() ) )
+	{
+		HRESULT hr = S_OK;
+		if( SUCCEEDED( hr = mDevice->CreateVertexShader( vs->GetBufferPointer(),
+														 vs->GetBufferSize(),
+														nullptr,
+														mVertexShader.GetAddressOf() ) ) )
+		{	
+			D3D11_INPUT_ELEMENT_DESC inputDesc[] = {				 
+				{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT,	0,  0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+				{ "NORMAL",	  0, DXGI_FORMAT_R32G32B32_FLOAT,	0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+				{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,		0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+
+				{ "WORLD",	  0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1,  0, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+				{ "WORLD",	  1, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 16, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+				{ "WORLD",	  2, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 32, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+				{ "WORLD",	  3, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 48, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+				{ "COLOR",	  0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 64, D3D11_INPUT_PER_INSTANCE_DATA, 1 } };
+
+			hr = mDevice->CreateInputLayout( inputDesc,
+											ARRAYSIZE( inputDesc ),
+											vs->GetBufferPointer(),
+											vs->GetBufferSize(),
+											mInputLayout.GetAddressOf() );
+
+		}
+
+		// Compile Pixel Shader
+		ComPtr<ID3DBlob> ps = nullptr;
+
+		if( CompileShader( "Shader.hlsl", "PixelShaderMain", "ps_5_0", nullptr, ps.GetAddressOf() ) )
+		{
+			hr = mDevice->CreatePixelShader( ps->GetBufferPointer(),
+											ps->GetBufferSize(),
+											nullptr,
+											mPixelShader.GetAddressOf() );
+
+		}	
+		else if( hr == E_FAIL )
+			return false;
+	}
+
+	return true;
+}
+
+bool GraphicSystem::CompileShader( char* shaderFile, char* pEntrypoint, char* pTarget, D3D10_SHADER_MACRO* pDefines, ID3DBlob** pCompiledShader )
+{
+	DWORD dwShaderFlags =	D3DCOMPILE_ENABLE_STRICTNESS | 
+		D3DCOMPILE_IEEE_STRICTNESS | D3DCOMPILE_DEBUG;
+
+	std::string shader_code;
+	std::ifstream in( shaderFile, std::ios::in | std::ios::binary );
+
+	if ( in )
+	{
+		in.seekg( 0, std::ios::end );
+		shader_code.resize( (unsigned int)in.tellg() );
+		in.seekg( 0, std::ios::beg );
+		in.read( &shader_code[0], shader_code.size() );
+		in.close();
+	}
+
+	ComPtr<ID3DBlob> errorBlob = nullptr;
+	HRESULT hr = D3DCompile( shader_code.data(),
+					 shader_code.size(),
+					 NULL,
+					 pDefines,
+					 nullptr,
+					 pEntrypoint,
+					 pTarget,
+					 dwShaderFlags,
+					 NULL,
+					 pCompiledShader,
+					 &errorBlob );
+
+	if( errorBlob )
+		OutputDebugStringA( (char*)errorBlob->GetBufferPointer() );
+
+	return true;
+
+}
+
 void GraphicSystem::BeginFrame()
 {
 	mDeviceContext->ClearDepthStencilView( mDepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0 );
 	mDeviceContext->ClearRenderTargetView( mRenderTargetView.Get(), Colors::PaleVioletRed );
 	mDeviceContext->OMSetRenderTargets( 1, mRenderTargetView.GetAddressOf(), mDepthStencilView.Get() );
 
+	mDeviceContext->RSSetState( mRasterizerState.Get() );
+	mDeviceContext->IASetInputLayout( mInputLayout.Get() );
+	mDeviceContext->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
+
+	mDeviceContext->VSSetShader( mVertexShader.Get(), nullptr, 0 );
+	mDeviceContext->GSSetShader( nullptr, nullptr, 0 );
+	mDeviceContext->PSSetShader( mPixelShader.Get(), nullptr, 0 );
+	
 }
 
 void GraphicSystem::EndFrame()
@@ -247,6 +347,9 @@ bool GraphicSystem::Initialize( HWND& windowHandle )
 	if( !InitializeDirectXComponents() )
 		return false;
 
+	if( !InitializeShaders() )
+		return false;
+
 	mCubeMesh = std::make_unique<CubeMesh>();
 
 	if( !BuildMeshVBuffer() )
@@ -257,6 +360,8 @@ bool GraphicSystem::Initialize( HWND& windowHandle )
 
 	if( !BuildInstanceCBuffer() )
 		return false;
+
+	
 
 
 	return true;

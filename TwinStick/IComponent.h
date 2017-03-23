@@ -8,7 +8,6 @@
 
 #include "EComponentType.h"
 
-
 __interface IComponent
 {
 	virtual const EComponentType GetType() const = 0;

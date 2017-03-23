@@ -238,10 +238,21 @@ const bool Engine::RequestActor( std::vector<std::unique_ptr<IComponent>>& compo
 							mActors->componentMasks[i] = static_cast<size_t>( 
 								mActors->componentMasks[i] | EComponentType::Transform );
 						}
+						else
+							OutputDebugString( "Error: Unable to set TransformComponent data" );
+
 						break;
 					}
 					case EComponentType::Camera :
 					{
+						if( mActors->mCameraComponents[mNumActiveActors]->Set( component ) )
+						{ 
+							mActors->componentMasks[i] = static_cast<size_t>( 
+								mActors->componentMasks[i] | EComponentType::Camera );
+						}
+						else
+							OutputDebugString( "Error: Unable to set CameraComponent data" );
+
 						break;
 					}
 					default:
