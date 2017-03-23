@@ -6,6 +6,7 @@
 using namespace DirectX;;
 using Microsoft::WRL::ComPtr;
 
+#define GRAPHIC_MASK ( EComponentType::Transform | EComponentType::Mesh )
 
 bool GraphicSystem::InitializeDirectXComponents()
 {
@@ -262,13 +263,11 @@ bool GraphicSystem::Initialize( HWND& windowHandle )
 
 }
 
-
-
 bool GraphicSystem::Update( float deltaTime, std::unique_ptr<ActorCollection>& actors, size_t numActiveActor )
 {
-
 	if( !Render() )
 		return false;
 
 	return true;
+
 }
