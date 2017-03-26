@@ -16,6 +16,7 @@ class CameraSystem : public ISystems
 		DirectX::XMFLOAT4X4 mViewMatrix;
 		DirectX::XMFLOAT4X4 mProjectionMatrix;
 		
+
 		size_t	mFollowedActorID;
 		bool	mIsFollowingActor;
 		float	mDistanceToFollowedActor;
@@ -23,12 +24,12 @@ class CameraSystem : public ISystems
 	public:
 		CameraSystem();
 		~CameraSystem();
-
+			
 		bool Initialize();
 		void FollowActor( const size_t actorID = 0, const bool followActor = true ) noexcept;
 		void SetFocusPoint( const DirectX::XMFLOAT3& newFocusPoint = DirectX::XMFLOAT3() ) noexcept;
-
-
+		void SetDistanceToFollowedActor( const float distanceToActor ) noexcept;
+		
 		inline DirectX::XMFLOAT4X4 GetViewMatrix() const noexcept
 		{
 			return mViewMatrix;

@@ -42,6 +42,12 @@ void CameraSystem::SetFocusPoint( const XMFLOAT3& newFocusPoint ) noexcept
 
 }
 
+void CameraSystem::SetDistanceToFollowedActor( const float distanceToActor ) noexcept
+{
+	mDistanceToFollowedActor = distanceToActor;
+
+}
+
 bool CameraSystem::Update( float deltaTime, std::unique_ptr<ActorCollection>& actors,
 						   size_t numActiveActor, void* systemSpecificInput )
 {
@@ -58,6 +64,12 @@ bool CameraSystem::Update( float deltaTime, std::unique_ptr<ActorCollection>& ac
 			std::unique_ptr<TransformComponent>& actorTransform = 
 				actors->mTransformComponents[mFollowedActorID];
 			
+			// Update CameraLocation
+			XMVECTOR newCameraLocation = XMLoadFloat3( &actorTransform->location ) -
+				XMLoadFloat3( &mLookVector ) * mDistanceToFollowedActor;
+			XMStoreFloat3( &mCameraLocation, newCameraLocation );
+			E = XMLoadFloat3( &mCameraLocation );
+
 			L = XMLoadFloat3( &actorTransform->location  ) -
 				XMLoadFloat3( &mCameraLocation );
 
