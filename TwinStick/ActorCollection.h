@@ -4,7 +4,6 @@
 #include <memory>
 
 #include "TransformComponent.h"
-#include "CameraComponent.h"
 
 struct ActorCollection
 {
@@ -12,6 +11,5 @@ struct ActorCollection
 	std::vector<size_t>	componentMasks;
 
 	std::vector<std::unique_ptr<TransformComponent>>	mTransformComponents;
-	std::vector<std::unique_ptr<CameraComponent>>		mCameraComponents;
 
 };

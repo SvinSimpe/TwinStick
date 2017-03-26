@@ -2,6 +2,7 @@
 
 #include <DirectXMath.h>
 
+
 struct InstanceData
 {
 	DirectX::XMFLOAT4X4	worldMatrix;

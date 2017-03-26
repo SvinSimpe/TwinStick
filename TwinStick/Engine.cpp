@@ -14,14 +14,21 @@ bool Engine::Update( float deltaTime )
 {
 	CheckInactiveActors();
 
-	// Update Systems
-	//if( !mCameraSystem->Update( deltaTime, mActors, mNumActiveActors ) )
-	//	return false;
 
-	if( !mGraphicSystem->Update( deltaTime, mActors, mNumActiveActors ) )
+	// Update systems
+
+
+
+	// Update last
+	if( !mCameraSystem->Update( deltaTime, mActors, mNumActiveActors, nullptr ) )
 		return false;
 
-	
+	FrameData newFrameData = { mCameraSystem->GetViewMatrix(), mCameraSystem->GetViewMatrix() };
+
+	if( !mGraphicSystem->Update( deltaTime, mActors, mNumActiveActors, &newFrameData ) )
+		return false;
+
+
 
 	return true;
 
@@ -29,13 +36,12 @@ bool Engine::Update( float deltaTime )
 
 bool Engine::InitializeSystems()
 {
+	mCameraSystem = std::make_unique<CameraSystem>();
+	if( !mCameraSystem->Initialize() )
+		return false;
 
 	mGraphicSystem = std::make_unique<GraphicSystem>();
 	if( !mGraphicSystem->Initialize( mHWnd ) )
-		return false;
-
-	mCameraSystem = std::make_unique<CameraSystem>();
-	if( !mCameraSystem->Initialize() )
 		return false;
 
 	return true;
@@ -51,14 +57,12 @@ void Engine::InitializeActors()
 		mActors->mIsActive.push_back( false );
 		mActors->componentMasks.push_back( 0 );
 		mActors->mTransformComponents.push_back( std::make_unique<TransformComponent>() );
-		mActors->mCameraComponents.push_back( std::make_unique<CameraComponent>() );
 
 	}
 
 	mActors->mIsActive.resize( GameGlobals::MAX_ACTORS );
 	mActors->componentMasks.resize( GameGlobals::MAX_ACTORS );
 	mActors->mTransformComponents.resize( GameGlobals::MAX_ACTORS );
-	mActors->mCameraComponents.resize( GameGlobals::MAX_ACTORS );
 
 }
 
@@ -71,7 +75,6 @@ void Engine::CheckInactiveActors()
 			std::swap( mActors->mIsActive[i], mActors->mIsActive[mNumActiveActors] );
 			std::swap( mActors->componentMasks[i], mActors->componentMasks[mNumActiveActors] );
 			mActors->mTransformComponents[i].swap( mActors->mTransformComponents[mNumActiveActors] );
-			mActors->mCameraComponents[i].swap( mActors->mCameraComponents[mNumActiveActors] );
 
 			mNumActiveActors--;
 
@@ -240,18 +243,6 @@ const bool Engine::RequestActor( std::vector<std::unique_ptr<IComponent>>& compo
 						}
 						else
 							OutputDebugString( "Error: Unable to set TransformComponent data" );
-
-						break;
-					}
-					case EComponentType::Camera :
-					{
-						if( mActors->mCameraComponents[mNumActiveActors]->Set( component ) )
-						{ 
-							mActors->componentMasks[i] = static_cast<size_t>( 
-								mActors->componentMasks[i] | EComponentType::Camera );
-						}
-						else
-							OutputDebugString( "Error: Unable to set CameraComponent data" );
 
 						break;
 					}

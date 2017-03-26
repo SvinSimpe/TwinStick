@@ -118,10 +118,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ActorCollection.h" />
-    <ClInclude Include="CameraComponent.h" />
     <ClInclude Include="CameraSystem.h" />
-    <ClInclude Include="CBufferData.h" />
+    <ClInclude Include="CBufferTypes.h" />
     <ClInclude Include="CubeMesh.h" />
+    <ClInclude Include="EActorType.h" />
     <ClInclude Include="EBufferType.h" />
     <ClInclude Include="EComponentType.h" />
     <ClInclude Include="EMeshType.h" />

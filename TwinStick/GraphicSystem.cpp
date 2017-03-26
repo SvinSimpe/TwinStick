@@ -1,7 +1,7 @@
 #include "GraphicSystem.h"
 #include "Utility.h"
 #include <DirectXColors.h>
-#include "CBufferData.h"
+
 
 #pragma comment( lib, "d3dcompiler.lib" )
 #include <d3dcompiler.h>
@@ -210,9 +210,18 @@ void GraphicSystem::BeginFrame()
 	mDeviceContext->ClearRenderTargetView( mRenderTargetView.Get(), Colors::PaleVioletRed );
 	mDeviceContext->OMSetRenderTargets( 1, mRenderTargetView.GetAddressOf(), mDepthStencilView.Get() );
 
+
+	UINT32 stride[]	= { sizeof(Vertex32) };
+	UINT32 offset[]	= { 0 };
+	mDeviceContext->IASetVertexBuffers( 0, 1, mBuffers[static_cast<size_t>(EBufferType::Vertex)].GetAddressOf(), stride, offset );
+	mDeviceContext->VSSetConstantBuffers( 1, 1, mBuffers[static_cast<size_t>( EBufferType::Frame )].GetAddressOf() );
+	mDeviceContext->VSSetConstantBuffers( 2, 1, mBuffers[static_cast<size_t>( EBufferType::Instance )].GetAddressOf() );
+
 	mDeviceContext->RSSetState( mRasterizerState.Get() );
 	mDeviceContext->IASetInputLayout( mInputLayout.Get() );
 	mDeviceContext->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
+
+
 
 	mDeviceContext->VSSetShader( mVertexShader.Get(), nullptr, 0 );
 	mDeviceContext->GSSetShader( nullptr, nullptr, 0 );
@@ -233,6 +242,8 @@ bool GraphicSystem::Render()
 	BeginFrame();
 
 	// Render Components;
+	mDeviceContext->DrawInstanced( static_cast<UINT>( mCubeMesh->vertices.size() ), 1, 0, 0 );
+
 
 	EndFrame();
 	return true;
@@ -274,8 +285,7 @@ bool GraphicSystem::BuildMeshVBuffer()
 	D3D11_SUBRESOURCE_DATA vinitData;
 	vinitData.SysMemPitch		= 0;
 	vinitData.SysMemSlicePitch	= 0;
-	//vinitData.pSysMem			= &data[0];
-	vinitData.pSysMem = &mCubeMesh->vertices;
+	vinitData.pSysMem			= &mCubeMesh->vertices[0];
 
 	if( FAILED( mDevice->CreateBuffer( &vbd, &vinitData,
 									   mBuffers[static_cast<size_t>(EBufferType::Vertex)].GetAddressOf() ) ) )
@@ -306,7 +316,7 @@ bool GraphicSystem::BuildInstanceCBuffer()
 	D3D11_BUFFER_DESC ibDesc;
 	ibDesc.ByteWidth			= sizeof( InstanceData ) * GameGlobals::MAX_ACTORS;
 	ibDesc.Usage				= D3D11_USAGE_DYNAMIC;
-	ibDesc.BindFlags			= D3D11_BIND_VERTEX_BUFFER;
+	ibDesc.BindFlags			= D3D11_BIND_CONSTANT_BUFFER;
 	ibDesc.CPUAccessFlags		= D3D11_CPU_ACCESS_WRITE;
 	ibDesc.MiscFlags			= 0;
 	ibDesc.StructureByteStride	= 0;
@@ -316,6 +326,13 @@ bool GraphicSystem::BuildInstanceCBuffer()
 		return false;
 
 	return true;
+}
+
+bool GraphicSystem::UpdateFrameCBuffer( FrameData & newFrameData )
+{
+
+	return true;
+
 }
 
 GraphicSystem::GraphicSystem()
@@ -368,8 +385,10 @@ bool GraphicSystem::Initialize( HWND& windowHandle )
 
 }
 
-bool GraphicSystem::Update( float deltaTime, std::unique_ptr<ActorCollection>& actors, size_t numActiveActor )
+bool GraphicSystem::Update( float deltaTime, std::unique_ptr<ActorCollection>& actors,
+							size_t numActiveActor, void* systemSpecificInput )
 {
+	UpdateFrameCBuffer( *( static_cast<FrameData*>( systemSpecificInput ) ) );
 	if( !Render() )
 		return false;
 

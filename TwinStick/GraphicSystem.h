@@ -9,6 +9,7 @@
 #include "CubeMesh.h"
 
 #include "EBufferType.h"
+#include "CBufferTypes.h"
 
 class GraphicSystem : public ISystems
 {
@@ -46,6 +47,8 @@ class GraphicSystem : public ISystems
 		bool BuildFrameCBuffer();
 		bool BuildInstanceCBuffer();
 
+		bool UpdateFrameCBuffer( FrameData& newFrameData );
+
 	public:
 		GraphicSystem();
 		~GraphicSystem();
@@ -53,5 +56,6 @@ class GraphicSystem : public ISystems
 		
 
 		// Inherited via ISystems
-		virtual bool Update( float deltaTime, std::unique_ptr<ActorCollection>& actors, size_t numActiveActor ) override;
+		virtual bool Update( float deltaTime, std::unique_ptr<ActorCollection>& actors,
+							 size_t numActiveActor, void* systemSpecificInput ) override;
 };
