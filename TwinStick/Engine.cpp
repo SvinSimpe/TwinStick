@@ -23,12 +23,12 @@ bool Engine::Update( float deltaTime )
 	if( !mCameraSystem->Update( deltaTime, mActors, mNumActiveActors, nullptr ) )
 		return false;
 
-	FrameData newFrameData = { mCameraSystem->GetViewMatrix(), mCameraSystem->GetViewMatrix() };
+	FrameData newFrameData = { mCameraSystem->GetViewMatrix(),
+								mCameraSystem->GetViewMatrix(),
+								mCameraSystem->GetCameraLocation() };
 
 	if( !mGraphicSystem->Update( deltaTime, mActors, mNumActiveActors, &newFrameData ) )
 		return false;
-
-
 
 	return true;
 

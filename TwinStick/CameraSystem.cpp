@@ -6,27 +6,72 @@ using namespace DirectX;
 #define CAMERA_MASK ( EComponentType::Transform )
 
 
-CameraSystem::CameraSystem()
-{
-	mFocusPoint		= XMFLOAT3();
-	mUpVector		= XMFLOAT3();
-	mRightVector	= XMFLOAT3();
-	mLookVector		= XMFLOAT3();
+//CameraSystem::CameraSystem()
+//{
+//	mFocusPoint		= XMFLOAT3();
+//	mUpVector		= XMFLOAT3();
+//	mRightVector	= XMFLOAT3();
+//	mLookVector		= XMFLOAT3();
+//
+//	mViewMatrix			= XMFLOAT4X4();
+//	mProjectionMatrix	= XMFLOAT4X4();
+//
+//	mFollowedActorID	= -1;
+//	mIsFollowingActor	= false;
+//	
+//	mMinDrawDistance	= 0.0f;
+//	mMaxDrawDistance	= 0.0f;
+//
+//}
 
-	mViewMatrix			= XMFLOAT4X4();
-	mProjectionMatrix	= XMFLOAT4X4();
+CameraSystem::CameraSystem( const XMFLOAT3 cameraLocation, const XMFLOAT3 focusPoint, const XMFLOAT3 upVector,
+							const XMFLOAT3 rightVector, const float minDrawDistance, const float maxDrawDistance, const float fieldOfView )
+{
+	mCameraLocation	= cameraLocation;
+	mFocusPoint		= focusPoint;
+	mUpVector		= upVector;
+	mRightVector	= rightVector;
+	
+	XMVECTOR tempLookVector = XMLoadFloat3( &mFocusPoint ) - XMLoadFloat3( &mCameraLocation );
+	XMStoreFloat3( &mLookVector, tempLookVector );
+
+	mMinDrawDistance	= minDrawDistance;
+	mMaxDrawDistance	= maxDrawDistance;
+	mFieldOfView		= fieldOfView;
 
 	mFollowedActorID	= -1;
 	mIsFollowingActor	= false;
+
+
+	XMMATRIX tempViewMatrix = XMMatrixLookAtLH( XMLoadFloat3( &mCameraLocation ), 
+												XMLoadFloat3( &mFocusPoint ),
+												XMLoadFloat3( &mUpVector ) );
+	XMStoreFloat4x4( &mViewMatrix, tempViewMatrix );
+
+
+	XMMATRIX tempProjectionMatrix = XMMatrixPerspectiveFovLH( mFieldOfView,
+		(float)Resolution::SCREEN_WIDTH / (float)Resolution::SCREEN_HEIGHT,
+															  mMinDrawDistance, mMaxDrawDistance );
+	XMStoreFloat4x4( &mProjectionMatrix, tempProjectionMatrix );
 
 }
 
 CameraSystem::~CameraSystem()
 {}
 
-bool CameraSystem::Initialize()
+bool CameraSystem::Initialize( const float minDrawDistance, const float maxDrawDistance, const float fieldOfView )
 {
+	mMinDrawDistance	= minDrawDistance;
+	mMaxDrawDistance	= maxDrawDistance;
+	mFieldOfView		= fieldOfView;
+
+	XMMATRIX tempProjectionMatrix = XMMatrixPerspectiveFovLH( mFieldOfView,
+		(float)Resolution::SCREEN_WIDTH / (float)Resolution::SCREEN_HEIGHT,
+															  mMinDrawDistance, mMaxDrawDistance );
+	XMStoreFloat4x4( &mProjectionMatrix, tempProjectionMatrix );
+
 	return true;
+
 }
 
 void CameraSystem::FollowActor( const size_t actorID, const bool followActor ) noexcept
