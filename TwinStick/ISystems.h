@@ -8,7 +8,7 @@ __interface ISystems
 {
 	virtual bool Update( float deltaTime, 
 						 std::unique_ptr<ActorCollection>& actors,
-						 size_t numActiveActor,
+						 size_t numActiveActors,
 						 void* systemSpecificInput ) = 0;
 
 };

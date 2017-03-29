@@ -23,8 +23,8 @@ bool Engine::Update( float deltaTime )
 	if( !mCameraSystem->Update( deltaTime, mActors, mNumActiveActors, nullptr ) )
 		return false;
 
-	FrameData newFrameData = { mCameraSystem->GetViewMatrix(),
-								mCameraSystem->GetViewMatrix(),
+	FrameData newFrameData = { mCameraSystem->GetViewMatrixTranspose(),
+								mCameraSystem->GetProjectionMatrixTranspose(),
 								mCameraSystem->GetCameraLocation() };
 
 	if( !mGraphicSystem->Update( deltaTime, mActors, mNumActiveActors, &newFrameData ) )
@@ -36,8 +36,8 @@ bool Engine::Update( float deltaTime )
 
 bool Engine::InitializeSystems()
 {
-	mCameraSystem = std::make_unique<CameraSystem>();
-	if( !mCameraSystem->Initialize() )
+	mCameraSystem = std::make_unique<CameraSystem>( XMFLOAT3( 20.0f, 20.0f, -20.0f ) );
+	if( !mCameraSystem )
 		return false;
 
 	mGraphicSystem = std::make_unique<GraphicSystem>();
@@ -57,13 +57,14 @@ void Engine::InitializeActors()
 		mActors->mIsActive.push_back( false );
 		mActors->componentMasks.push_back( 0 );
 		mActors->mTransformComponents.push_back( std::make_unique<TransformComponent>() );
+		mActors->mMeshComponents.push_back( std::make_unique<MeshComponent>() );
 
 	}
 
 	mActors->mIsActive.resize( GameGlobals::MAX_ACTORS );
 	mActors->componentMasks.resize( GameGlobals::MAX_ACTORS );
 	mActors->mTransformComponents.resize( GameGlobals::MAX_ACTORS );
-
+	mActors->mMeshComponents.resize( GameGlobals::MAX_ACTORS );
 }
 
 void Engine::CheckInactiveActors()
@@ -243,6 +244,18 @@ const bool Engine::RequestActor( std::vector<std::unique_ptr<IComponent>>& compo
 						}
 						else
 							OutputDebugString( "Error: Unable to set TransformComponent data" );
+
+						break;
+					}
+					case EComponentType::Mesh :
+					{
+						if( mActors->mMeshComponents[mNumActiveActors]->Set( component ) )
+						{
+							mActors->componentMasks[i] = static_cast<size_t>( 
+								mActors->componentMasks[i] | EComponentType::Mesh );
+						}
+						else
+							OutputDebugString( "Error: Unable to set MeshComponent data" );
 
 						break;
 					}

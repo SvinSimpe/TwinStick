@@ -40,14 +40,15 @@ class GraphicSystem : public ISystems
 
 		void BeginFrame();
 		void EndFrame();
-		bool Render();
+		bool Render( const size_t numActiveActors );
 		void SetViewport();
 
 		bool BuildMeshVBuffer();
 		bool BuildFrameCBuffer();
-		bool BuildInstanceCBuffer();
+		bool BuildInstanceBuffer();
 
 		bool UpdateFrameCBuffer( FrameData& newFrameData );
+		bool UpdateInstanceCBuffer( std::unique_ptr<ActorCollection>& actors, const size_t numActiveActors );
 
 	public:
 		GraphicSystem();
@@ -57,5 +58,5 @@ class GraphicSystem : public ISystems
 
 		// Inherited via ISystems
 		virtual bool Update( float deltaTime, std::unique_ptr<ActorCollection>& actors,
-							 size_t numActiveActor, void* systemSpecificInput ) override;
+							 size_t numActiveActors, void* systemSpecificInput ) override;
 };

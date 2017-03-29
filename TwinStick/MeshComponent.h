@@ -5,15 +5,17 @@
 
 struct MeshComponent : public IComponent
 {
-	EMeshType	meshType;
-	bool		isVisible;
+	bool				isVisible;
+	EMeshType			meshType;
+	DirectX::XMFLOAT4	color;
 
-	MeshComponent( const EMeshType newMeshType = EMeshType::Cube,
-				   bool newVisibility = false )
+	MeshComponent( bool newVisibility = false,
+				   const EMeshType newMeshType = EMeshType::Cube,
+				   DirectX::XMFLOAT4 newColor = DirectX::XMFLOAT4( 1.0f, 1.0f, 1.0f, 1.0f ) )
 	{
-		meshType	= newMeshType;
 		isVisible	= newVisibility;
-
+		meshType	= newMeshType;
+		color		= newColor;
 	}
 
 	virtual const EComponentType GetType() const
@@ -27,8 +29,9 @@ struct MeshComponent : public IComponent
 		try
 		{
 			MeshComponent& newMesh = dynamic_cast<MeshComponent&>( *newData );
-			meshType	= newMesh.meshType;
 			isVisible	= newMesh.isVisible;
+			meshType	= newMesh.meshType;
+			color		= newMesh.color;
 
 		}
 		catch( const std::exception& exc )

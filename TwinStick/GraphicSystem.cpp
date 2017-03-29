@@ -1,7 +1,7 @@
 #include "GraphicSystem.h"
 #include "Utility.h"
 #include <DirectXColors.h>
-
+#include "ActorCollection.h"
 
 #pragma comment( lib, "d3dcompiler.lib" )
 #include <d3dcompiler.h>
@@ -74,15 +74,14 @@ bool GraphicSystem::InitializeDirectXComponents()
 
 	// Create Render Target View
 	ComPtr<ID3D11Texture2D> backBuffer = nullptr;
-	//ID3D11Texture2D* pBackBuffer;
-	if ( SUCCEEDED( hr = mSwapChain->GetBuffer( 0, __uuidof( ID3D11Texture2D ), (void**)&backBuffer ) ) )
+	if ( SUCCEEDED( mSwapChain->GetBuffer( 0, __uuidof( ID3D11Texture2D ), (void**)&backBuffer ) ) )
 	{
 		hr = mDevice->CreateRenderTargetView( backBuffer.Get(), nullptr, mRenderTargetView.GetAddressOf() );
-		//SAFE_RELEASE( backBuffer );
+
 	}
 
 	if( FAILED( hr ) )
-		return hr;
+		return false;
 
 
 	// Create Depth Stencil View
@@ -101,7 +100,7 @@ bool GraphicSystem::InitializeDirectXComponents()
 	dsd.CPUAccessFlags		= 0;
 	dsd.MiscFlags			= 0;
 
-	if( FAILED( hr = mDevice->CreateTexture2D( &dsd, nullptr, depthStencil.GetAddressOf() ) ) )
+	if( FAILED( mDevice->CreateTexture2D( &dsd, nullptr, depthStencil.GetAddressOf() ) ) )
 		return false;
 
 	D3D11_DEPTH_STENCIL_VIEW_DESC dsvd;
@@ -110,10 +109,20 @@ bool GraphicSystem::InitializeDirectXComponents()
 	dsvd.ViewDimension		= D3D11_DSV_DIMENSION_TEXTURE2DMS;
 	dsvd.Texture2D.MipSlice	= 0;
 
-	if( FAILED( hr = mDevice->CreateDepthStencilView( depthStencil.Get(), &dsvd, mDepthStencilView.GetAddressOf() ) ) )
+	if( FAILED( mDevice->CreateDepthStencilView( depthStencil.Get(), &dsvd, mDepthStencilView.GetAddressOf() ) ) )
 		return hr;
 
 	SetViewport();
+
+	// Create Rasterizer State
+	D3D11_RASTERIZER_DESC desc;
+	memset( &desc, 0, sizeof( desc ) );
+	desc.FillMode			= D3D11_FILL_WIREFRAME;
+	desc.CullMode			= D3D11_CULL_FRONT;
+	desc.DepthClipEnable	= true;
+
+	if( FAILED( mDevice->CreateRasterizerState( &desc, mRasterizerState.GetAddressOf() ) ) )
+		return false;
 
 	return true;
 }
@@ -206,16 +215,24 @@ bool GraphicSystem::CompileShader( char* shaderFile, char* pEntrypoint, char* pT
 
 void GraphicSystem::BeginFrame()
 {
+	SetViewport();
 	mDeviceContext->ClearDepthStencilView( mDepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0 );
-	mDeviceContext->ClearRenderTargetView( mRenderTargetView.Get(), Colors::PaleVioletRed );
+	mDeviceContext->ClearRenderTargetView( mRenderTargetView.Get(), Colors::DimGray );
 	mDeviceContext->OMSetRenderTargets( 1, mRenderTargetView.GetAddressOf(), mDepthStencilView.Get() );
+	
+
+	// Set VertexData buffer and InstanceData buffer
+	UINT32 stride[2]				= { sizeof(Vertex32), sizeof(InstanceData) };
+	UINT32 offset[2]				= { 0, 0 };
+	ID3D11Buffer* buffersToSet[2]	= { mBuffers[static_cast<size_t>(EBufferType::Vertex)].Get() ,
+										mBuffers[static_cast<size_t>( EBufferType::Instance )].Get() };
+	mDeviceContext->IASetVertexBuffers( 0, 2, buffersToSet, stride, offset );
+	mDeviceContext->VSSetConstantBuffers( 0, 1, mBuffers[static_cast<size_t>( EBufferType::Frame )].GetAddressOf() );
+	
 
 
-	UINT32 stride[]	= { sizeof(Vertex32) };
-	UINT32 offset[]	= { 0 };
-	mDeviceContext->IASetVertexBuffers( 0, 1, mBuffers[static_cast<size_t>(EBufferType::Vertex)].GetAddressOf(), stride, offset );
-	mDeviceContext->VSSetConstantBuffers( 1, 1, mBuffers[static_cast<size_t>( EBufferType::Frame )].GetAddressOf() );
-	mDeviceContext->VSSetConstantBuffers( 2, 1, mBuffers[static_cast<size_t>( EBufferType::Instance )].GetAddressOf() );
+
+
 
 	mDeviceContext->RSSetState( mRasterizerState.Get() );
 	mDeviceContext->IASetInputLayout( mInputLayout.Get() );
@@ -232,17 +249,18 @@ void GraphicSystem::BeginFrame()
 void GraphicSystem::EndFrame()
 {
 	// Swap Front and Back Buffer
-	mSwapChain->Present( 0, 0 );
+	mSwapChain->Present( 1, 0 );
 	mDeviceContext->ClearState();
 
 }
 
-bool GraphicSystem::Render()
+bool GraphicSystem::Render( const size_t numActiveActors )
 {
 	BeginFrame();
 
 	// Render Components;
-	mDeviceContext->DrawInstanced( static_cast<UINT>( mCubeMesh->vertices.size() ), 1, 0, 0 );
+	mDeviceContext->DrawInstanced( static_cast<UINT>( mCubeMesh->vertices.size() ),
+								   static_cast<UINT>(numActiveActors), 0, 0 );
 
 
 	EndFrame();
@@ -311,12 +329,12 @@ bool GraphicSystem::BuildFrameCBuffer()
 	return true;
 }
 
-bool GraphicSystem::BuildInstanceCBuffer()
+bool GraphicSystem::BuildInstanceBuffer()
 {
 	D3D11_BUFFER_DESC ibDesc;
 	ibDesc.ByteWidth			= sizeof( InstanceData ) * GameGlobals::MAX_ACTORS;
 	ibDesc.Usage				= D3D11_USAGE_DYNAMIC;
-	ibDesc.BindFlags			= D3D11_BIND_CONSTANT_BUFFER;
+	ibDesc.BindFlags			= D3D11_BIND_VERTEX_BUFFER;
 	ibDesc.CPUAccessFlags		= D3D11_CPU_ACCESS_WRITE;
 	ibDesc.MiscFlags			= 0;
 	ibDesc.StructureByteStride	= 0;
@@ -328,8 +346,67 @@ bool GraphicSystem::BuildInstanceCBuffer()
 	return true;
 }
 
-bool GraphicSystem::UpdateFrameCBuffer( FrameData & newFrameData )
+bool GraphicSystem::UpdateFrameCBuffer( FrameData &newFrameData )
 {
+	D3D11_MAPPED_SUBRESOURCE mappedResource;
+	HRESULT hr = mDeviceContext->Map( mBuffers[static_cast<size_t>(EBufferType::Frame)].Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource );
+
+	if( SUCCEEDED( hr ) )
+	{
+		memcpy( mappedResource.pData, &newFrameData, sizeof(FrameData) );
+		mDeviceContext->Unmap( mBuffers[static_cast<size_t>(EBufferType::Frame)].Get(), 0 );
+	}
+	else
+		return false;
+
+	return true;
+
+}
+
+bool GraphicSystem::UpdateInstanceCBuffer( std::unique_ptr<ActorCollection>& actors, const size_t numActiveActor )
+{
+	if( actors )
+	{
+		std::vector<InstanceData> actorWorldMatrices;
+
+		for( size_t i = 0; i < numActiveActor; i++ )
+		{
+			if( actors->mIsActive[i] &&
+				( actors->componentMasks[i] & GRAPHIC_MASK ) == GRAPHIC_MASK )
+			{ 			
+				TransformComponent& actorTransform = *actors->mTransformComponents[i];
+
+				XMMATRIX scale			= XMMatrixScalingFromVector( XMLoadFloat3( &actorTransform.scale ) );
+				XMMATRIX rotation		= XMMatrixRotationY( actorTransform.rotation.y );
+				XMMATRIX translation	= XMMatrixTranslationFromVector( XMLoadFloat3( &actorTransform.location ) );
+				XMMATRIX newWorldMatrix	= scale* rotation * translation;
+
+				// Store new World matrix and Color
+				InstanceData actorWorldAndColor;				
+				XMStoreFloat4x4( &actorWorldAndColor.worldMatrix, newWorldMatrix );
+				actorWorldAndColor.color = actors->mMeshComponents[i]->color;
+				actorWorldMatrices.push_back( actorWorldAndColor );
+
+			}
+		}
+
+		if( !actorWorldMatrices.empty() )
+		{
+			D3D11_MAPPED_SUBRESOURCE mappedResource;
+			HRESULT hr = mDeviceContext->Map( mBuffers[static_cast<size_t>(EBufferType::Instance)].Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource );
+
+			
+			if( SUCCEEDED( hr ) )
+			{
+
+				memcpy( mappedResource.pData, &actorWorldMatrices[0], sizeof(InstanceData) * actorWorldMatrices.size() );
+				mDeviceContext->Unmap( mBuffers[static_cast<size_t>(EBufferType::Instance)].Get(), 0 ); 
+			}
+			else
+				return false;
+
+		}
+	}
 
 	return true;
 
@@ -353,7 +430,6 @@ GraphicSystem::GraphicSystem()
 	mCubeMesh			= nullptr;
 }
 
-
 GraphicSystem::~GraphicSystem()
 {}
 
@@ -375,7 +451,7 @@ bool GraphicSystem::Initialize( HWND& windowHandle )
 	if( !BuildFrameCBuffer() )
 		return false;
 
-	if( !BuildInstanceCBuffer() )
+	if( !BuildInstanceBuffer() )
 		return false;
 
 	
@@ -386,11 +462,19 @@ bool GraphicSystem::Initialize( HWND& windowHandle )
 }
 
 bool GraphicSystem::Update( float deltaTime, std::unique_ptr<ActorCollection>& actors,
-							size_t numActiveActor, void* systemSpecificInput )
+							size_t numActiveActors, void* systemSpecificInput )
 {
-	UpdateFrameCBuffer( *( static_cast<FrameData*>( systemSpecificInput ) ) );
-	if( !Render() )
+	
+	if( !UpdateFrameCBuffer( *( static_cast<FrameData*>( systemSpecificInput ) ) ) )
 		return false;
+	
+	if( !UpdateInstanceCBuffer( actors, numActiveActors ) )
+		return false;
+	
+	if( !Render( numActiveActors ) )
+		return false;
+
+	
 
 	return true;
 

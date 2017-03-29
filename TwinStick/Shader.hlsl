@@ -1,7 +1,7 @@
 cbuffer CB_PER_FRAME : register(b0)
 {
-	float4x4  view;
-	float4x4  proj;
+	column_major float4x4  view;
+	column_major float4x4  proj;
 	float4	  eyePosition;
 };
 

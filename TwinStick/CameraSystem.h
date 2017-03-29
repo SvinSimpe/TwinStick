@@ -9,9 +9,10 @@ class CameraSystem : public ISystems
 	private:
 		DirectX::XMFLOAT3 mCameraLocation;
 		DirectX::XMFLOAT3 mFocusPoint;
+		DirectX::XMFLOAT3 mLookVector;
 		DirectX::XMFLOAT3 mUpVector;
 		DirectX::XMFLOAT3 mRightVector;
-		DirectX::XMFLOAT3 mLookVector;
+		
 
 		DirectX::XMFLOAT4X4 mViewMatrix;
 		DirectX::XMFLOAT4X4 mProjectionMatrix;
@@ -21,22 +22,24 @@ class CameraSystem : public ISystems
 		bool	mIsFollowingActor;
 		float	mDistanceToFollowedActor;
 
-		float	mMaxDrawDistance;
-		float	mMinDrawDistance;
+		float	mMaxCullDistance;
+		float	mMinCullDistance;
 		float	mFieldOfView;
+
+	private:
+		float	mRotationY;
+		void RotateCW( float deltaTime );
+		void RotateCCW( float deltaTime );
 
 	public:
 		//CameraSystem();
-		CameraSystem( const DirectX::XMFLOAT3 cameraLocation = DirectX::XMFLOAT3(),
-					  const DirectX::XMFLOAT3 focusPoint = DirectX::XMFLOAT3( 0.0f, 0.0f, 1.0f ), 
-					  const DirectX::XMFLOAT3 upVector = DirectX::XMFLOAT3( 0.0f, 1.0f, 1.0f ),
-					  const DirectX::XMFLOAT3 rightVector = DirectX::XMFLOAT3( 1.0f, 0.0f, 0.0f ),
-					  const float minDrawDistance = 0.5f,
-					  const float maxDrawDistance = 5000.0f,
-					  const float fieldOfView = 0.75f );
+		CameraSystem( const DirectX::XMFLOAT3 cameraLocation = DirectX::XMFLOAT3( 50.0f, 10.0f, -10.0f ),
+					  const DirectX::XMFLOAT3 focusPoint = DirectX::XMFLOAT3( 0.0f, 0.0f, 0.0f ), 
+					  const float minCullDistance = 0.5f,
+					  const float maxCullDistance = 5000.0f,
+					  const float fieldOfView = 0.4f );
 		~CameraSystem();
 			
-		bool Initialize( const float minDrawDistance = 0.5f, const float maxDrawDistance = 5000.0f, const float fieldOfView = 0.75 );
 		void FollowActor( const size_t actorID = 0, const bool followActor = true ) noexcept;
 		void SetFocusPoint( const DirectX::XMFLOAT3& newFocusPoint = DirectX::XMFLOAT3() ) noexcept;
 		void SetDistanceToFollowedActor( const float distanceToActor ) noexcept;
@@ -62,8 +65,28 @@ class CameraSystem : public ISystems
 
 		}
 
+		inline DirectX::XMFLOAT4X4 GetViewMatrixTranspose() const noexcept
+		{
+			DirectX::XMMATRIX temp = XMMatrixTranspose( XMLoadFloat4x4( &mViewMatrix ) );
+			DirectX::XMFLOAT4X4 viewTransposed;
+			XMStoreFloat4x4( &viewTransposed, temp );
+
+			return viewTransposed;
+
+		}
+
+		inline DirectX::XMFLOAT4X4 GetProjectionMatrixTranspose() const noexcept
+		{
+			DirectX::XMMATRIX temp = XMMatrixTranspose( XMLoadFloat4x4( &mProjectionMatrix ) );
+			DirectX::XMFLOAT4X4 projectionTransposed;
+			XMStoreFloat4x4( &projectionTransposed, temp );
+
+			return projectionTransposed;
+
+		}
+
 		// Inherited via ISystems
 		virtual bool Update( float deltaTime, std::unique_ptr<ActorCollection>& actors,
-							 size_t numActiveActor, void* systemSpecificInput ) override;
+							 size_t numActiveActors, void* systemSpecificInput ) override;
 
 };
