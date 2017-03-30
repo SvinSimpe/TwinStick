@@ -1,8 +1,6 @@
 #include "CameraSystem.h"
 #include "ActorCollection.h"
 #include "Utility.h"
-#include "stdafx.h"
-#include <sstream>
 
 using namespace DirectX;
 
@@ -10,15 +8,6 @@ using namespace DirectX;
 
 void CameraSystem::Rotate( float deltaTime, float angle  )
 {
-	mRotationY += deltaTime  * 5000.0f;// *0.01f;
-	float radian = 10.01f;//ConvertToRadians( atanf( deltaTime ) ) * 5.0f;
-
-	std::ostringstream ss;
-	ss << radian;
-	OutputDebugStringA( ss.str().c_str() );
-	OutputDebugStringA( "\n" );
-
-
 	XMMATRIX rotation		= XMMatrixRotationY( XMConvertToRadians( angle * deltaTime ) );
 
 	// Rotate Camera Axes at origin
