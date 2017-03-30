@@ -1,6 +1,14 @@
 #pragma once
 
 #include <DirectXMath.h>
+
+namespace GameGlobals
+{
+	constexpr size_t MAX_ACTORS = 256;
+
+}
+
+
 namespace Resolution
 { 
 	constexpr size_t SCREEN_WIDTH	= 1920;

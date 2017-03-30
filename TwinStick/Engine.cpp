@@ -14,14 +14,21 @@ bool Engine::Update( float deltaTime )
 {
 	CheckInactiveActors();
 
-	// Update Systems
-	//if( !mCameraSystem->Update( deltaTime, mActors, mNumActiveActors ) )
-	//	return false;
 
-	if( !mGraphicSystem->Update( deltaTime, mActors, mNumActiveActors ) )
+	// Update systems
+
+
+
+	// Update last
+	if( !mCameraSystem->Update( deltaTime, mActors, mNumActiveActors, nullptr ) )
 		return false;
 
-	
+	FrameData newFrameData = { mCameraSystem->GetViewMatrixTranspose(),
+								mCameraSystem->GetProjectionMatrixTranspose(),
+								mCameraSystem->GetCameraLocation() };
+
+	if( !mGraphicSystem->Update( deltaTime, mActors, mNumActiveActors, &newFrameData ) )
+		return false;
 
 	return true;
 
@@ -29,14 +36,44 @@ bool Engine::Update( float deltaTime )
 
 bool Engine::InitializeSystems()
 {
+	mCameraSystem = std::make_unique<CameraSystem>( XMFLOAT3( 20.0f, -20.0f, -20.0f ) );
+	if( !mCameraSystem )
+		return false;
 
 	mGraphicSystem = std::make_unique<GraphicSystem>();
 	if( !mGraphicSystem->Initialize( mHWnd ) )
 		return false;
 
-	mCameraSystem = std::make_unique<CameraSystem>();
-	if( !mCameraSystem->Initialize() )
+	return true;
+
+}
+
+bool Engine::InitializeActors()
+{
+	try
+	{
+		mActors = std::make_unique<ActorCollection>();
+
+		for( size_t i = 0; i < GameGlobals::MAX_ACTORS; i++ )
+		{
+			mActors->mIsActive.push_back( false );
+			mActors->componentMasks.push_back( 0 );
+			mActors->mTransformComponents.push_back( std::make_unique<TransformComponent>() );
+			mActors->mMeshComponents.push_back( std::make_unique<MeshComponent>() );
+			mActors->mHealthComponents.push_back( std::make_unique<HealthComponent>() );
+
+		}
+
+		mActors->mIsActive.resize( GameGlobals::MAX_ACTORS );
+		mActors->componentMasks.resize( GameGlobals::MAX_ACTORS );
+		mActors->mTransformComponents.resize( GameGlobals::MAX_ACTORS );
+		mActors->mMeshComponents.resize( GameGlobals::MAX_ACTORS );
+		mActors->mHealthComponents.resize( GameGlobals::MAX_ACTORS );
+	}
+	catch( const std::exception& )
+	{
 		return false;
+	}
 
 	return true;
 
@@ -51,7 +88,6 @@ void Engine::CheckInactiveActors()
 			std::swap( mActors->mIsActive[i], mActors->mIsActive[mNumActiveActors] );
 			std::swap( mActors->componentMasks[i], mActors->componentMasks[mNumActiveActors] );
 			mActors->mTransformComponents[i].swap( mActors->mTransformComponents[mNumActiveActors] );
-			mActors->mCameraComponents[i].swap( mActors->mCameraComponents[mNumActiveActors] );
 
 			mNumActiveActors--;
 
@@ -152,6 +188,9 @@ bool Engine::Initialize( HINSTANCE hInstance, int nCmdShow )
 	if( !InitializeSystems() )
 		return false;
 
+	if( !InitializeActors() )
+		return false;
+
 	return true;
 }
 
@@ -199,7 +238,7 @@ const bool Engine::RequestActor( std::vector<std::unique_ptr<IComponent>>& compo
 {
 	if( !componentList.empty() )
 	{
-		if( mNumActiveActors < MAX_ACTORS )
+		if( mNumActiveActors < GameGlobals::MAX_ACTORS )
 		{
 			const size_t& i = mNumActiveActors;
 			mActors->mIsActive[i] = true;
@@ -216,10 +255,33 @@ const bool Engine::RequestActor( std::vector<std::unique_ptr<IComponent>>& compo
 							mActors->componentMasks[i] = static_cast<size_t>( 
 								mActors->componentMasks[i] | EComponentType::Transform );
 						}
+						else
+							OutputDebugString( "Error: Unable to set TransformComponent data" );
+
 						break;
 					}
-					case EComponentType::Camera :
+					case EComponentType::Mesh :
 					{
+						if( mActors->mMeshComponents[mNumActiveActors]->Set( component ) )
+						{
+							mActors->componentMasks[i] = static_cast<size_t>( 
+								mActors->componentMasks[i] | EComponentType::Mesh );
+						}
+						else
+							OutputDebugString( "Error: Unable to set MeshComponent data" );
+
+						break;
+					}
+					case EComponentType::Health :
+					{
+						if( mActors->mHealthComponents[mNumActiveActors]->Set( component ) )
+						{
+							mActors->componentMasks[i] = static_cast<size_t>( 
+								mActors->componentMasks[i] | EComponentType::Health );
+						}
+						else
+							OutputDebugString( "Error: Unable to set HealthComponent data" );
+
 						break;
 					}
 					default:

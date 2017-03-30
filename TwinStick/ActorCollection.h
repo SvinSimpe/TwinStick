@@ -4,9 +4,9 @@
 #include <memory>
 
 #include "TransformComponent.h"
-#include "CameraComponent.h"
-
-#define MAX_ACTORS 256
+#include "MeshComponent.h"
+#include "MovementComponent.h"
+#include "HealthComponent.h"
 
 struct ActorCollection
 {
@@ -14,6 +14,7 @@ struct ActorCollection
 	std::vector<size_t>	componentMasks;
 
 	std::vector<std::unique_ptr<TransformComponent>>	mTransformComponents;
-	std::vector<std::unique_ptr<CameraComponent>>		mCameraComponents;
-
+	std::vector<std::unique_ptr<MeshComponent>>			mMeshComponents;
+	std::vector<std::unique_ptr<HealthComponent>>		mHealthComponents;
+	std::vector<std::unique_ptr<MovementComponent>>		mMovementComponents;
 };
