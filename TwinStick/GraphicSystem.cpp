@@ -118,7 +118,7 @@ bool GraphicSystem::InitializeDirectXComponents()
 	D3D11_RASTERIZER_DESC desc;
 	memset( &desc, 0, sizeof( desc ) );
 	desc.FillMode			= D3D11_FILL_WIREFRAME;
-	desc.CullMode			= D3D11_CULL_FRONT;
+	desc.CullMode			= D3D11_CULL_BACK;
 	desc.DepthClipEnable	= true;
 
 	if( FAILED( mDevice->CreateRasterizerState( &desc, mRasterizerState.GetAddressOf() ) ) )

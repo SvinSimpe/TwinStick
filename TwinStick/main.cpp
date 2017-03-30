@@ -13,9 +13,11 @@ int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdL
 		std::vector<std::unique_ptr<IComponent>> componentList;
 		std::unique_ptr<TransformComponent> transform = std::make_unique<TransformComponent>( XMFLOAT3( i * 2.0f, 0.0f, 0.0f ) );
 		std::unique_ptr<MeshComponent> mesh = std::make_unique<MeshComponent>();
-
+		std::unique_ptr<HealthComponent> health = std::make_unique<HealthComponent>( 50.0f, 150.0f );
 		componentList.push_back( std::move( transform ) );
 		componentList.push_back( std::move( mesh ) );
+		componentList.push_back( std::move( health ) );
+
 
 		engine->RequestActor( componentList );
 	}

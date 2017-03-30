@@ -5,6 +5,8 @@
 
 #include "TransformComponent.h"
 #include "MeshComponent.h"
+#include "MovementComponent.h"
+#include "HealthComponent.h"
 
 struct ActorCollection
 {
@@ -13,4 +15,6 @@ struct ActorCollection
 
 	std::vector<std::unique_ptr<TransformComponent>>	mTransformComponents;
 	std::vector<std::unique_ptr<MeshComponent>>			mMeshComponents;
+	std::vector<std::unique_ptr<HealthComponent>>		mHealthComponents;
+	std::vector<std::unique_ptr<MovementComponent>>		mMovementComponents;
 };

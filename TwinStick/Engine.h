@@ -5,7 +5,7 @@
 #include <memory>
 #include <vector>
 
-#include "ActorCollection.h"
+
 
 #include "GraphicSystem.h"
 #include "CameraSystem.h"
@@ -29,7 +29,7 @@ class Engine
 	private:
 		bool Update( float deltaTime );
 		bool InitializeSystems();
-		void InitializeActors();
+		bool InitializeActors();
 		void CheckInactiveActors();
 
 

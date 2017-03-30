@@ -1,8 +1,7 @@
 #pragma once
 
 #include <memory>
-
-struct ActorCollection;
+#include "ActorCollection.h"
 
 __interface ISystems
 {

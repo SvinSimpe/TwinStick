@@ -1,18 +1,25 @@
 #include "CameraSystem.h"
 #include "ActorCollection.h"
 #include "Utility.h"
+#include "stdafx.h"
+#include <sstream>
 
 using namespace DirectX;
 
 #define CAMERA_MASK ( EComponentType::Transform )
 
-void CameraSystem::RotateCW( float deltaTime )
+void CameraSystem::Rotate( float deltaTime, float angle  )
 {
+	mRotationY += deltaTime  * 5000.0f;// *0.01f;
+	float radian = 10.01f;//ConvertToRadians( atanf( deltaTime ) ) * 5.0f;
 
-	mRotationY -= deltaTime * 0.01f;
-	float r = XMConvertToRadians( deltaTime * 0.01f );
+	std::ostringstream ss;
+	ss << radian;
+	OutputDebugStringA( ss.str().c_str() );
+	OutputDebugStringA( "\n" );
 
-	XMMATRIX rotation		= XMMatrixRotationY( XMConvertToRadians( mRotationY ) );
+
+	XMMATRIX rotation		= XMMatrixRotationY( XMConvertToRadians( angle * deltaTime ) );
 
 	// Rotate Camera Axes at origin
 	XMVECTOR rotatedLook	=  XMVector3TransformCoord( XMLoadFloat3( &mLookVector ), rotation );
@@ -29,13 +36,6 @@ void CameraSystem::RotateCW( float deltaTime )
 	XMStoreFloat3( &mLookVector, rotatedLook );
 	XMStoreFloat3( &mUpVector, rotatedUp );
 	XMStoreFloat3( &mRightVector, rotatedRight );
-
-}
-
-void CameraSystem::RotateCCW( float deltaTime )
-{
-	XMMATRIX rotation = XMMatrixRotationY( mRotationY -= deltaTime );
-
 
 }
 
@@ -103,7 +103,7 @@ bool CameraSystem::Update( float deltaTime, std::unique_ptr<ActorCollection>& ac
 						   size_t numActiveActor, void* systemSpecificInput )
 {
 
-	RotateCW( deltaTime );
+	Rotate( deltaTime, -50.0f );
 
 	XMVECTOR E = XMLoadFloat3( &mCameraLocation );
 	XMVECTOR R = XMLoadFloat3( &mRightVector );

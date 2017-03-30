@@ -28,16 +28,15 @@ class CameraSystem : public ISystems
 
 	private:
 		float	mRotationY;
-		void RotateCW( float deltaTime );
-		void RotateCCW( float deltaTime );
+		void Rotate( float deltaTime, float angle );
 
 	public:
 		//CameraSystem();
-		CameraSystem( const DirectX::XMFLOAT3 cameraLocation = DirectX::XMFLOAT3( 50.0f, 10.0f, -10.0f ),
+		CameraSystem( const DirectX::XMFLOAT3 cameraLocation = DirectX::XMFLOAT3( 10.0f, 10.0f, -10.0f ),
 					  const DirectX::XMFLOAT3 focusPoint = DirectX::XMFLOAT3( 0.0f, 0.0f, 0.0f ), 
 					  const float minCullDistance = 0.5f,
 					  const float maxCullDistance = 5000.0f,
-					  const float fieldOfView = 0.4f );
+					  const float fieldOfView = 0.9f );
 		~CameraSystem();
 			
 		void FollowActor( const size_t actorID = 0, const bool followActor = true ) noexcept;
