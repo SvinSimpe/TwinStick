@@ -8,7 +8,6 @@
 #include <fstream>
 
 
-
 using namespace DirectX;
 using Microsoft::WRL::ComPtr;
 
@@ -117,7 +116,7 @@ bool GraphicSystem::InitializeDirectXComponents()
 	// Create Rasterizer State
 	D3D11_RASTERIZER_DESC desc;
 	memset( &desc, 0, sizeof( desc ) );
-	desc.FillMode			= D3D11_FILL_WIREFRAME;
+	desc.FillMode			= D3D11_FILL_SOLID;
 	desc.CullMode			= D3D11_CULL_BACK;
 	desc.DepthClipEnable	= true;
 
@@ -217,7 +216,7 @@ void GraphicSystem::BeginFrame()
 {
 	SetViewport();
 	mDeviceContext->ClearDepthStencilView( mDepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0 );
-	mDeviceContext->ClearRenderTargetView( mRenderTargetView.Get(), Colors::DimGray );
+	mDeviceContext->ClearRenderTargetView( mRenderTargetView.Get(), Colors::Black );
 	mDeviceContext->OMSetRenderTargets( 1, mRenderTargetView.GetAddressOf(), mDepthStencilView.Get() );
 	
 
@@ -261,7 +260,6 @@ bool GraphicSystem::Render( const size_t numActiveActors )
 	// Render Components;
 	mDeviceContext->DrawInstanced( static_cast<UINT>( mCubeMesh->vertices.size() ),
 								   static_cast<UINT>(numActiveActors), 0, 0 );
-
 
 	EndFrame();
 	return true;
