@@ -1,9 +1,16 @@
 #include "MovementSystem.h"
+#include "Utility.h"
+#include "stdafx.h"
+
+using namespace DirectX;
+
 
 #define MOVEMENT_MASK ( EComponentType::Transform | EComponentType::Movement )
 
 MovementSystem::MovementSystem()
-{}
+{
+
+}
 
 MovementSystem::~MovementSystem()
 {}
@@ -15,7 +22,27 @@ bool MovementSystem::Update( float deltaTime, std::unique_ptr<ActorCollection>& 
 		if( actors->mIsActive[i] &&
 			( actors->componentMasks[i] & MOVEMENT_MASK ) == MOVEMENT_MASK )
 		{
+			std::unique_ptr<TransformComponent>& transformComp	= actors->mTransformComponents[i];
+			std::unique_ptr<MovementComponent>& moveComp		= actors->mMovementComponents[i];
 
+			if( ( XMVectorGetX( XMVector3LengthEst( XMLoadFloat3( &moveComp->targetLocation ) -
+									  XMLoadFloat3( &transformComp->location ) ) ) <= 5.0f ) ||
+				IsVector3Zero( moveComp->velocity ) )
+			{
+				// Set new target
+				moveComp->targetLocation = XMFLOAT3( RandomFloatInRange( -350.0f, 350.0f ),
+													 0.0f,						   
+													 RandomFloatInRange( -250.0f, 250.0f ) );
+
+
+				XMStoreFloat3( &moveComp->velocity, XMVector3Normalize( XMLoadFloat3( &moveComp->targetLocation ) -
+																		XMLoadFloat3( &transformComp->location ) ) );
+			}
+
+
+			// Move actor towards target location
+			XMStoreFloat3( &transformComp->location,
+						   XMLoadFloat3( &transformComp->location ) + XMLoadFloat3( &moveComp->velocity ) * moveComp->speed * deltaTime );
 
 		}
 	}

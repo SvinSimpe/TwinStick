@@ -2,17 +2,17 @@
 
 #include "IComponent.h"
 #include <DirectXMath.h>
-using namespace DirectX;
+
 struct TransformComponent : public IComponent
 {
-	XMFLOAT3	location	= XMFLOAT3();
-	XMFLOAT3	rotation	= XMFLOAT3();
-	XMFLOAT3	scale		= XMFLOAT3();
+	DirectX::XMFLOAT3	location	= DirectX::XMFLOAT3();
+	DirectX::XMFLOAT3	rotation	= DirectX::XMFLOAT3();
+	DirectX::XMFLOAT3	scale		= DirectX::XMFLOAT3();
 	bool		isDirty		= false;
 
-	TransformComponent( XMFLOAT3 initialLocation = XMFLOAT3(),
-						XMFLOAT3 initialRotation = XMFLOAT3(),
-						XMFLOAT3 initialScale = XMFLOAT3( 1.0f, 1.0f, 1.0f ) )
+	TransformComponent( DirectX::XMFLOAT3 initialLocation = DirectX::XMFLOAT3(),
+						DirectX::XMFLOAT3 initialRotation = DirectX::XMFLOAT3(),
+						DirectX::XMFLOAT3 initialScale = DirectX::XMFLOAT3( 1.0f, 1.0f, 1.0f ) )
 	{
 		location	= initialLocation;
 		rotation	= initialRotation;
@@ -39,12 +39,16 @@ struct TransformComponent : public IComponent
 			location	= newTransform.location;
 			rotation	= newTransform.rotation;
 			scale		= newTransform.scale;
-			isDirty		= true;
+			isDirty		= true;			
 
 		}
 		catch( const std::exception& exc )
 		{
-			std::cerr << "Error occurred: " << exc.what() << std::endl;
+
+			#if _DEBUG
+				OutputDebugStringA( "Error: " );
+				OutputDebugStringA( exc.what() );
+			#endif
 			return false;
 
 		}

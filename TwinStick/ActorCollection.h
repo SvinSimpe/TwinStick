@@ -17,4 +17,5 @@ struct ActorCollection
 	std::vector<std::unique_ptr<MeshComponent>>			mMeshComponents;
 	std::vector<std::unique_ptr<HealthComponent>>		mHealthComponents;
 	std::vector<std::unique_ptr<MovementComponent>>		mMovementComponents;
+
 };

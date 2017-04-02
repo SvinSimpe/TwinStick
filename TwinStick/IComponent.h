@@ -3,7 +3,7 @@
 #include <memory>
 
 #if _DEBUG
-	#include <iostream>
+	#include <Windows.h>
 #endif
 
 #include "EComponentType.h"

@@ -37,7 +37,11 @@ struct HealthComponent : public IComponent
 		}
 		catch( const std::exception& exc )
 		{
-			std::cerr << "Error occurred: " << exc.what() << std::endl;
+			#if _DEBUG
+				OutputDebugStringA( "Error: " );
+				OutputDebugStringA( exc.what() );
+			#endif
+			
 			return false;
 
 		}
