@@ -14,18 +14,19 @@ bool Engine::Update( float deltaTime )
 {
 	CheckInactiveActors();
 
-
 	// Update systems
+	if( !mSteeringBehaviourSystem->Update( deltaTime, mActors, mNumActiveActors, nullptr ) )
+		return false;
 
+	if( !mMovementSystem->Update( deltaTime, mActors, mNumActiveActors, nullptr ) )
+		return false;
 
-
-	// Update last
 	if( !mCameraSystem->Update( deltaTime, mActors, mNumActiveActors, nullptr ) )
 		return false;
 
 	FrameData newFrameData = { mCameraSystem->GetViewMatrixTranspose(),
-								mCameraSystem->GetProjectionMatrixTranspose(),
-								mCameraSystem->GetCameraLocation() };
+		mCameraSystem->GetProjectionMatrixTranspose(),
+		mCameraSystem->GetCameraLocation() };
 
 	if( !mGraphicSystem->Update( deltaTime, mActors, mNumActiveActors, &newFrameData ) )
 		return false;
@@ -36,12 +37,20 @@ bool Engine::Update( float deltaTime )
 
 bool Engine::InitializeSystems()
 {
-	mCameraSystem = std::make_unique<CameraSystem>( XMFLOAT3( 20.0f, -20.0f, -20.0f ) );
+	mCameraSystem = std::make_unique<CameraSystem>( XMFLOAT3( 0.0f, 500.0f, -10.0f ) );
 	if( !mCameraSystem )
 		return false;
 
 	mGraphicSystem = std::make_unique<GraphicSystem>();
 	if( !mGraphicSystem->Initialize( mHWnd ) )
+		return false;
+
+	mMovementSystem = std::make_unique<MovementSystem>();
+	if( !mMovementSystem )
+		return false;
+
+	mSteeringBehaviourSystem = std::make_unique<SteeringBehaviourSystem>();
+	if( !mSteeringBehaviourSystem )
 		return false;
 
 	return true;
@@ -54,6 +63,14 @@ bool Engine::InitializeActors()
 	{
 		mActors = std::make_unique<ActorCollection>();
 
+		mActors->mIsActive.reserve( GameGlobals::MAX_ACTORS );
+		mActors->componentMasks.reserve( GameGlobals::MAX_ACTORS );
+		mActors->mTransformComponents.reserve( GameGlobals::MAX_ACTORS );
+		mActors->mMeshComponents.reserve( GameGlobals::MAX_ACTORS );
+		mActors->mHealthComponents.reserve( GameGlobals::MAX_ACTORS );
+		mActors->mMovementComponents.reserve( GameGlobals::MAX_ACTORS );
+		mActors->mSteeringBehaviorComponents.reserve( GameGlobals::MAX_ACTORS );
+
 		for( size_t i = 0; i < GameGlobals::MAX_ACTORS; i++ )
 		{
 			mActors->mIsActive.push_back( false );
@@ -61,14 +78,10 @@ bool Engine::InitializeActors()
 			mActors->mTransformComponents.push_back( std::make_unique<TransformComponent>() );
 			mActors->mMeshComponents.push_back( std::make_unique<MeshComponent>() );
 			mActors->mHealthComponents.push_back( std::make_unique<HealthComponent>() );
+			mActors->mMovementComponents.push_back( std::make_unique<MovementComponent>() );
+			mActors->mSteeringBehaviorComponents.push_back( std::make_unique<SteeringBehaviourComponent>() );
 
 		}
-
-		mActors->mIsActive.resize( GameGlobals::MAX_ACTORS );
-		mActors->componentMasks.resize( GameGlobals::MAX_ACTORS );
-		mActors->mTransformComponents.resize( GameGlobals::MAX_ACTORS );
-		mActors->mMeshComponents.resize( GameGlobals::MAX_ACTORS );
-		mActors->mHealthComponents.resize( GameGlobals::MAX_ACTORS );
 	}
 	catch( const std::exception& )
 	{
@@ -88,7 +101,7 @@ void Engine::CheckInactiveActors()
 			std::swap( mActors->mIsActive[i], mActors->mIsActive[mNumActiveActors] );
 			std::swap( mActors->componentMasks[i], mActors->componentMasks[mNumActiveActors] );
 			mActors->mTransformComponents[i].swap( mActors->mTransformComponents[mNumActiveActors] );
-
+			mActors->mMovementComponents[i].swap( mActors->mMovementComponents[mNumActiveActors] );
 			mNumActiveActors--;
 
 		}
@@ -133,8 +146,8 @@ Engine::Engine()
 
 	mGraphicSystem	= nullptr;
 	mCameraSystem	= nullptr;
+	mMovementSystem = nullptr;
 }
-
 
 Engine::~Engine()
 {}
@@ -197,10 +210,7 @@ bool Engine::Initialize( HINSTANCE hInstance, int nCmdShow )
 int Engine::Run()
 {
 	__int64 cntsPerSec = 0;
-	
-	//QueryPerformanceFrequency( reinterpret_cast<LARGE_INTEGER*>( &cntsPerSec ) );
 	QueryPerformanceFrequency( (LARGE_INTEGER*)&cntsPerSec );
-	//float secsPerCnt = 1.0f / (float)cntsPerSec;
 	float secsPerCnt = 1.0f / static_cast<float>( cntsPerSec );
 
 	__int64 prevTimeStamp = 0;
@@ -221,10 +231,9 @@ int Engine::Run()
 			QueryPerformanceCounter( (LARGE_INTEGER*)&currTimeStamp );
 			float deltaTime = ( currTimeStamp - prevTimeStamp ) * secsPerCnt;
 
-			// Update & Render
+			// Update Engine modules
 			if( !Update( deltaTime ) ) 
 				return -1;
-			//Render();
 
 			prevTimeStamp = currTimeStamp;
 		}
@@ -236,61 +245,82 @@ int Engine::Run()
 
 const bool Engine::RequestActor( std::vector<std::unique_ptr<IComponent>>& componentList )
 {
-	if( !componentList.empty() )
+	if( !componentList.empty() && mNumActiveActors < GameGlobals::MAX_ACTORS )
 	{
-		if( mNumActiveActors < GameGlobals::MAX_ACTORS )
+		const size_t& i = mNumActiveActors;
+		mActors->mIsActive[i] = true;
+
+		// Set Components
+		for( auto& component : componentList )
 		{
-			const size_t& i = mNumActiveActors;
-			mActors->mIsActive[i] = true;
-
-			// Set Components
-			for( auto& component : componentList )
+			switch( component->GetType() )
 			{
-				switch( component->GetType() )
+				case EComponentType::Transform :
 				{
-					case EComponentType::Transform :
+					if( mActors->mTransformComponents[mNumActiveActors]->Set( component ) )
 					{
-						if( mActors->mTransformComponents[mNumActiveActors]->Set( component ) )
-						{
-							mActors->componentMasks[i] = static_cast<size_t>( 
-								mActors->componentMasks[i] | EComponentType::Transform );
-						}
-						else
-							OutputDebugString( "Error: Unable to set TransformComponent data" );
-
-						break;
+						mActors->componentMasks[i] = static_cast<size_t>( 
+							mActors->componentMasks[i] | EComponentType::Transform );
 					}
-					case EComponentType::Mesh :
-					{
-						if( mActors->mMeshComponents[mNumActiveActors]->Set( component ) )
-						{
-							mActors->componentMasks[i] = static_cast<size_t>( 
-								mActors->componentMasks[i] | EComponentType::Mesh );
-						}
-						else
-							OutputDebugString( "Error: Unable to set MeshComponent data" );
+					else
+						OutputDebugString( "Error: Unable to set TransformComponent data" );
 
-						break;
-					}
-					case EComponentType::Health :
-					{
-						if( mActors->mHealthComponents[mNumActiveActors]->Set( component ) )
-						{
-							mActors->componentMasks[i] = static_cast<size_t>( 
-								mActors->componentMasks[i] | EComponentType::Health );
-						}
-						else
-							OutputDebugString( "Error: Unable to set HealthComponent data" );
-
-						break;
-					}
-					default:
-						break;
+					break;
 				}
-			}
-			mNumActiveActors++;
+				case EComponentType::Mesh :
+				{
+					if( mActors->mMeshComponents[mNumActiveActors]->Set( component ) )
+					{
+						mActors->componentMasks[i] = static_cast<size_t>( 
+							mActors->componentMasks[i] | EComponentType::Mesh );
+					}
+					else
+						OutputDebugString( "Error: Unable to set MeshComponent data" );
 
+					break;
+				}
+				case EComponentType::Health :
+				{
+					if( mActors->mHealthComponents[mNumActiveActors]->Set( component ) )
+					{
+						mActors->componentMasks[i] = static_cast<size_t>( 
+							mActors->componentMasks[i] | EComponentType::Health );
+					}
+					else
+						OutputDebugString( "Error: Unable to set HealthComponent data" );
+
+					break;
+				}
+				case EComponentType::Movement :
+				{
+					if( mActors->mMovementComponents[mNumActiveActors]->Set( component ) )
+					{
+						mActors->componentMasks[i] = static_cast<size_t>( 
+							mActors->componentMasks[i] | EComponentType::Movement );
+					}
+					else
+						OutputDebugString( "Error: Unable to set MovementComponent data" );
+
+					break;
+				}
+				case EComponentType::SteeringBehaviour :
+				{
+					if( mActors->mSteeringBehaviorComponents[mNumActiveActors]->Set( component ) )
+					{
+						mActors->componentMasks[i] = static_cast<size_t>( 
+							mActors->componentMasks[i] | EComponentType::SteeringBehaviour );
+					}
+					else
+						OutputDebugString( "Error: Unable to set SteeringBehaviourComponent data" );
+
+					break;
+				}
+				default:
+					break;
+			}
 		}
+		mNumActiveActors++;
+
 	}
 
 	return true;
