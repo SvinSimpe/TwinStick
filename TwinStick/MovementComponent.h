@@ -11,7 +11,7 @@ struct MovementComponent : public IComponent
 	DirectX::XMFLOAT3	velocity			= DirectX::XMFLOAT3();
 	DirectX::XMFLOAT3	maxVelocity			= DirectX::XMFLOAT3();
 	DirectX::XMFLOAT3	acceleration		= DirectX::XMFLOAT3();
-	DirectX::XMFLOAT3	maxAcceleration		= DirectX::XMFLOAT3();
+	float				maxAcceleration		= 0.0f;;
 	DirectX::XMFLOAT3	targetLocation		= DirectX::XMFLOAT3();
 	DirectX::XMFLOAT3	targetRotation		= DirectX::XMFLOAT3();
 
@@ -22,7 +22,7 @@ struct MovementComponent : public IComponent
 					   DirectX::XMFLOAT3 velocity = DirectX::XMFLOAT3(),
 					   DirectX::XMFLOAT3 maxVelocity = DirectX::XMFLOAT3(),
 					   DirectX::XMFLOAT3 acceleration = DirectX::XMFLOAT3(),
-					   DirectX::XMFLOAT3 maxAcceleration = DirectX::XMFLOAT3(),
+					   float maxAcceleration = 1.0f,
 					   DirectX::XMFLOAT3 targetLocation = DirectX::XMFLOAT3(),
 					   DirectX::XMFLOAT3 targetRotation = DirectX::XMFLOAT3() )
 	{

@@ -10,7 +10,7 @@
 #include "GraphicSystem.h"
 #include "CameraSystem.h"
 #include "MovementSystem.h"
-
+#include "SteeringBehaviourSystem.h"
 
 
 class Engine
@@ -23,9 +23,10 @@ class Engine
 		unsigned int						mNumActiveActors;
 
 		// Systems
-		std::unique_ptr<GraphicSystem>	mGraphicSystem;
-		std::unique_ptr<CameraSystem>	mCameraSystem;
-		std::unique_ptr<MovementSystem>	mMovementSystem;
+		std::unique_ptr<GraphicSystem>				mGraphicSystem;
+		std::unique_ptr<CameraSystem>				mCameraSystem;
+		std::unique_ptr<MovementSystem>				mMovementSystem;
+		std::unique_ptr<SteeringBehaviourSystem>	mSteeringBehaviourSystem;
 
 
 	private:

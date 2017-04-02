@@ -48,10 +48,10 @@
     <ClCompile Include="CameraSystem.cpp">
       <Filter>Source Files\Systems</Filter>
     </ClCompile>
-    <ClCompile Include="BehaviourSystem.cpp">
+    <ClCompile Include="MovementSystem.cpp">
       <Filter>Source Files\Systems</Filter>
     </ClCompile>
-    <ClCompile Include="MovementSystem.cpp">
+    <ClCompile Include="SteeringBehaviourSystem.cpp">
       <Filter>Source Files\Systems</Filter>
     </ClCompile>
   </ItemGroup>
@@ -83,9 +83,6 @@
     <ClInclude Include="MeshComponent.h">
       <Filter>Header Files\Components</Filter>
     </ClInclude>
-    <ClInclude Include="BehaviourSystem.h">
-      <Filter>Header Files\Systems</Filter>
-    </ClInclude>
     <ClInclude Include="MovementComponent.h">
       <Filter>Header Files\Components</Filter>
     </ClInclude>
@@ -115,6 +112,15 @@
     </ClInclude>
     <ClInclude Include="HealthComponent.h">
       <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="SteeringBehaviourComponent.h">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="SteeringBehaviourSystem.h">
+      <Filter>Header Files\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="ESteeringBehaviourState.h">
+      <Filter>Header Files\Enums</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

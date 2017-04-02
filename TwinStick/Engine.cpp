@@ -15,6 +15,9 @@ bool Engine::Update( float deltaTime )
 	CheckInactiveActors();
 
 	// Update systems
+	if( !mSteeringBehaviourSystem->Update( deltaTime, mActors, mNumActiveActors, nullptr ) )
+		return false;
+
 	if( !mMovementSystem->Update( deltaTime, mActors, mNumActiveActors, nullptr ) )
 		return false;
 
@@ -34,7 +37,7 @@ bool Engine::Update( float deltaTime )
 
 bool Engine::InitializeSystems()
 {
-	mCameraSystem = std::make_unique<CameraSystem>( XMFLOAT3( 0.0f, 250.0f, -400.0f ) );
+	mCameraSystem = std::make_unique<CameraSystem>( XMFLOAT3( 0.0f, 500.0f, -10.0f ) );
 	if( !mCameraSystem )
 		return false;
 
@@ -45,7 +48,10 @@ bool Engine::InitializeSystems()
 	mMovementSystem = std::make_unique<MovementSystem>();
 	if( !mMovementSystem )
 		return false;
-	
+
+	mSteeringBehaviourSystem = std::make_unique<SteeringBehaviourSystem>();
+	if( !mSteeringBehaviourSystem )
+		return false;
 
 	return true;
 
@@ -57,6 +63,14 @@ bool Engine::InitializeActors()
 	{
 		mActors = std::make_unique<ActorCollection>();
 
+		mActors->mIsActive.reserve( GameGlobals::MAX_ACTORS );
+		mActors->componentMasks.reserve( GameGlobals::MAX_ACTORS );
+		mActors->mTransformComponents.reserve( GameGlobals::MAX_ACTORS );
+		mActors->mMeshComponents.reserve( GameGlobals::MAX_ACTORS );
+		mActors->mHealthComponents.reserve( GameGlobals::MAX_ACTORS );
+		mActors->mMovementComponents.reserve( GameGlobals::MAX_ACTORS );
+		mActors->mSteeringBehaviorComponents.reserve( GameGlobals::MAX_ACTORS );
+
 		for( size_t i = 0; i < GameGlobals::MAX_ACTORS; i++ )
 		{
 			mActors->mIsActive.push_back( false );
@@ -65,16 +79,9 @@ bool Engine::InitializeActors()
 			mActors->mMeshComponents.push_back( std::make_unique<MeshComponent>() );
 			mActors->mHealthComponents.push_back( std::make_unique<HealthComponent>() );
 			mActors->mMovementComponents.push_back( std::make_unique<MovementComponent>() );
+			mActors->mSteeringBehaviorComponents.push_back( std::make_unique<SteeringBehaviourComponent>() );
 
 		}
-
-		mActors->mIsActive.resize( GameGlobals::MAX_ACTORS );
-		mActors->componentMasks.resize( GameGlobals::MAX_ACTORS );
-		mActors->mTransformComponents.resize( GameGlobals::MAX_ACTORS );
-		mActors->mMeshComponents.resize( GameGlobals::MAX_ACTORS );
-		mActors->mHealthComponents.resize( GameGlobals::MAX_ACTORS );
-		mActors->mMovementComponents.resize( GameGlobals::MAX_ACTORS );
-
 	}
 	catch( const std::exception& )
 	{
@@ -293,6 +300,18 @@ const bool Engine::RequestActor( std::vector<std::unique_ptr<IComponent>>& compo
 					}
 					else
 						OutputDebugString( "Error: Unable to set MovementComponent data" );
+
+					break;
+				}
+				case EComponentType::SteeringBehaviour :
+				{
+					if( mActors->mSteeringBehaviorComponents[mNumActiveActors]->Set( component ) )
+					{
+						mActors->componentMasks[i] = static_cast<size_t>( 
+							mActors->componentMasks[i] | EComponentType::SteeringBehaviour );
+					}
+					else
+						OutputDebugString( "Error: Unable to set SteeringBehaviourComponent data" );
 
 					break;
 				}

@@ -39,6 +39,22 @@ inline constexpr bool IsVector3Zero( const DirectX::XMFLOAT3& v ) noexcept
 
 }
 
+inline constexpr DirectX::XMFLOAT3 Vector3Truncate( const DirectX::XMFLOAT3& v, const float max ) noexcept
+{
+	return DirectX::XMFLOAT3( ( v.x < max ) ? v.x : max, 
+								( v.y < max ) ? v.y : max, 
+								( v.z < max ) ? v.z : max );
+
+}
+
+inline constexpr DirectX::XMFLOAT3 Vector3Truncate( const DirectX::XMFLOAT3& v, const float min, const float max ) noexcept
+{
+	return DirectX::XMFLOAT3( ( v.x < 0.0f ) ? /*neg*/ ( ( v.x > min ) ? v.x : min ) : /*pos*/ ( ( v.x < max ) ? v.x : max ), 
+								( v.y < 0.0f ) ? /*neg*/ ( ( v.y > min ) ? v.y : min ) : /*pos*/ ( ( v.y < max ) ? v.y : max ), 
+								( v.z < 0.0f ) ? /*neg*/ ( ( v.z > min ) ? v.z : min ) : /*pos*/ ( ( v.z < max ) ? v.z : max ) );
+
+}
+
 
 inline const float RandomFloatInRange( const float min, const float max )
 {
