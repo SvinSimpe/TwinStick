@@ -27,7 +27,7 @@ struct MovementComponent : public IComponent
 					   DirectX::XMFLOAT3 targetRotation = DirectX::XMFLOAT3() )
 	{
 		this->isMoving			= isMoving;
-		this->speed				= speed;
+		this->speed				= speed * 3.0f;
 		this->velocity			= velocity;
 		this->maxVelocity		= maxVelocity;
 		this->acceleration		= acceleration;

@@ -28,9 +28,6 @@ bool SteeringBehaviourSystem::Update( float deltaTime, std::unique_ptr<ActorColl
 			{
 				case ESteeringBehaviourState::Wander :
 				{
-
-
-
 					break;
 				}
 				case ESteeringBehaviourState::Seek :
@@ -44,7 +41,7 @@ bool SteeringBehaviourSystem::Update( float deltaTime, std::unique_ptr<ActorColl
 					XMStoreFloat3( &steerComp->steeringVector, XMLoadFloat3( &steerComp->desiredVelocity ) -
 																XMLoadFloat3( &moveComp->velocity ) );
 
-					// Make sure steeringVector magnitude doesn't exceed maxAcceleretion
+					// Make sure steeringVector magnitude doesn't exceed maxAcceleration
 					steerComp->steeringVector = Vector3Truncate( steerComp->steeringVector,
 																 moveComp->maxAcceleration * -1.0f,
 																 moveComp->maxAcceleration );

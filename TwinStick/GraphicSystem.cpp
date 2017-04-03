@@ -116,7 +116,7 @@ bool GraphicSystem::InitializeDirectXComponents()
 	// Create Rasterizer State
 	D3D11_RASTERIZER_DESC desc;
 	memset( &desc, 0, sizeof( desc ) );
-	desc.FillMode			= D3D11_FILL_SOLID;
+	desc.FillMode			= D3D11_FILL_WIREFRAME;
 	desc.CullMode			= D3D11_CULL_BACK;
 	desc.DepthClipEnable	= true;
 

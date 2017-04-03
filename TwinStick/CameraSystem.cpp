@@ -103,7 +103,7 @@ bool CameraSystem::Update( float deltaTime, std::unique_ptr<ActorCollection>& ac
 	XMStoreFloat3( &mUpVector, XMVector3Cross( XMLoadFloat3( &mLookVector ),
 											   XMLoadFloat3( &mRightVector ) ) );
 
-	//Rotate( deltaTime, -2.0f );
+	//Rotate( deltaTime, -20.0f );
 
 	//Translate( deltaTime, XMFLOAT3( 0.0f, 1.0f, 0.0f ) );
 	
