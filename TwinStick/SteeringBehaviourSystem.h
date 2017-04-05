@@ -1,11 +1,19 @@
 #pragma once
 
 #include "ISystems.h"
+#include <DirectXMath.h>
+
+
 
 class SteeringBehaviourSystem : public ISystems
 {
 
 	private:
+
+		void CalculateActorSteeringAndVelocity( std::unique_ptr<TransformComponent>& transformComp,
+												std::unique_ptr<MovementComponent>& moveComp,
+												std::unique_ptr<SteeringBehaviourComponent>& steerComp,
+												const float directionModifier = 1.0f );
 
 	public:
 		SteeringBehaviourSystem();

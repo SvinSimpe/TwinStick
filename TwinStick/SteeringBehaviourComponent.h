@@ -10,16 +10,19 @@ struct SteeringBehaviourComponent : public IComponent
 	DirectX::XMFLOAT3		desiredVelocity		= DirectX::XMFLOAT3();
 	DirectX::XMFLOAT3		steeringVector		= DirectX::XMFLOAT3();
 	ESteeringBehaviourState	state				= ESteeringBehaviourState::Wander;
+	float					wanderCooldown		= 0.0f;
 
 	SteeringBehaviourComponent( const float mass = 1.0f,
 								DirectX::XMFLOAT3 desiredVelocity = DirectX::XMFLOAT3(),
 								DirectX::XMFLOAT3 steeringVector = DirectX::XMFLOAT3(),
-								ESteeringBehaviourState state = ESteeringBehaviourState::Seek )
+								ESteeringBehaviourState state = ESteeringBehaviourState::Seek,
+								const float wanderCooldown = 1.0f)
 	{
 		this->mass				= mass;
 		this->desiredVelocity	= desiredVelocity;
 		this->steeringVector	= steeringVector;
 		this->state				= state;
+		this->wanderCooldown	= wanderCooldown;
 
 	}
 
@@ -37,6 +40,7 @@ struct SteeringBehaviourComponent : public IComponent
 			this->desiredVelocity	= newSteeringBehaviour.desiredVelocity;
 			this->steeringVector	= newSteeringBehaviour.steeringVector;
 			this->state				= newSteeringBehaviour.state;
+			this->wanderCooldown	= newSteeringBehaviour.wanderCooldown;
 
 		}
 		

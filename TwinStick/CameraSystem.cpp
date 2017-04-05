@@ -25,7 +25,7 @@ CameraSystem::CameraSystem( const XMFLOAT3 cameraLocation, const XMFLOAT3 focusP
 	
 	mFollowedActorID			= 0;
 	mIsFollowingActor			= false;
-	mDistanceToFollowedActor	= XMVectorGetX( XMVector3Length( look ) );
+	mDistanceToFollowedActor	= 160.0f;
 
 	mMinCullDistance	= minDrawDistance;
 	mMaxCullDistance	= maxDrawDistance;

@@ -247,8 +247,8 @@ const bool Engine::RequestActor( std::vector<std::unique_ptr<IComponent>>& compo
 {
 	if( !componentList.empty() && mNumActiveActors < GameGlobals::MAX_ACTORS )
 	{
-		const size_t& i = mNumActiveActors;
-		mActors->mIsActive[i] = true;
+		const size_t& i			= mNumActiveActors;
+		mActors->mIsActive[i]	= true;
 
 		// Set Components
 		for( auto& component : componentList )

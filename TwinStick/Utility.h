@@ -6,6 +6,16 @@
 namespace GameGlobals
 {
 	constexpr size_t MAX_ACTORS = 2048;
+
+	namespace WorldBounds
+	{
+		constexpr float WIDTH_MIN = -500.0f;
+		constexpr float WIDTH_MAX = 500.0f;
+		constexpr float DEPTH_MIN = -200.0f;
+		constexpr float DEPTH_MAX = 500.0f;;
+
+	}
+
 }
 
 
@@ -56,10 +66,22 @@ inline constexpr DirectX::XMFLOAT3 Vector3Truncate( const DirectX::XMFLOAT3& v, 
 }
 
 
-inline const float RandomFloatInRange( const float min, const float max )
+inline const float RandomFloatInRange( const float min, const float max )  noexcept
 {
 
 	return ( min + static_cast<float>( rand() % static_cast<int>(
 		( max) - ( min ) + 1.0f ) ) );
 
 }
+
+// Returns 'value' mapped from one range into another
+inline const float MapToRange( const float value, const float inRangeMin, const float inRangeMax,
+							   const float outRangeMin, const float outRangeMax )  noexcept
+{
+	const float inputRange	= inRangeMax - inRangeMin;
+	const float outputRange	= outRangeMax - outRangeMin;
+
+	return ( value - inRangeMin ) * outputRange / inputRange + outRangeMin;
+
+}
+
