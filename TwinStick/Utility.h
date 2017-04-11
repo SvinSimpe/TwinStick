@@ -6,6 +6,16 @@
 namespace GameGlobals
 {
 	constexpr size_t MAX_ACTORS = 2048;
+
+	namespace WorldBounds
+	{
+		constexpr float X_MIN = -50.0f;
+		constexpr float X_MAX = 50.0f;
+		constexpr float Z_MIN = -20.0f;
+		constexpr float Z_MAX = 50.0f;;
+
+	}
+
 }
 
 
@@ -47,7 +57,7 @@ inline constexpr DirectX::XMFLOAT3 Vector3Truncate( const DirectX::XMFLOAT3& v, 
 
 }
 
-inline constexpr DirectX::XMFLOAT3 Vector3Truncate( const DirectX::XMFLOAT3& v, const float min, const float max ) noexcept
+inline constexpr DirectX::XMFLOAT3 Vector3Clamp( const DirectX::XMFLOAT3& v, const float min, const float max ) noexcept
 {
 	return DirectX::XMFLOAT3( ( v.x < 0.0f ) ? /*neg*/ ( ( v.x > min ) ? v.x : min ) : /*pos*/ ( ( v.x < max ) ? v.x : max ), 
 								( v.y < 0.0f ) ? /*neg*/ ( ( v.y > min ) ? v.y : min ) : /*pos*/ ( ( v.y < max ) ? v.y : max ), 
@@ -56,10 +66,22 @@ inline constexpr DirectX::XMFLOAT3 Vector3Truncate( const DirectX::XMFLOAT3& v, 
 }
 
 
-inline const float RandomFloatInRange( const float min, const float max )
+inline const float RandomFloatInRange( const float min, const float max )  noexcept
 {
 
 	return ( min + static_cast<float>( rand() % static_cast<int>(
 		( max) - ( min ) + 1.0f ) ) );
 
 }
+
+// Returns 'value' mapped from one range into another
+inline const float MapToRange( const float value, const float inRangeMin, const float inRangeMax,
+							   const float outRangeMin, const float outRangeMax )  noexcept
+{
+	const float inputRange	= inRangeMax - inRangeMin;
+	const float outputRange	= outRangeMax - outRangeMin;
+
+	return ( value - inRangeMin ) * outputRange / inputRange + outRangeMin;
+
+}
+

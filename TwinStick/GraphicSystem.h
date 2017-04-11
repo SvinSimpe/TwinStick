@@ -34,13 +34,17 @@ class GraphicSystem : public ISystems
 		std::unique_ptr<CubeMesh>	mCubeMesh;
 
 	private:
+		bool CreateRenderTargetView();
+		bool CreateDepthStencilView();
+		bool CreateRasterizerState();
 		bool InitializeDirectXComponents();
 		bool InitializeShaders();
-		bool CompileShader( char* shaderFile, char* pEntrypoint, char* pTarget, D3D10_SHADER_MACRO* pDefines, ID3DBlob** pCompiledShader );
+		bool CompileShader( char* shaderFile, char* pEntrypoint, char* pTarget,
+							D3D10_SHADER_MACRO* pDefines, ID3DBlob** pCompiledShader );
 
 		void BeginFrame();
 		void EndFrame();
-		bool Render( const size_t numActiveActors );
+		void Render( const size_t numActiveActors );
 		void SetViewport();
 
 		bool BuildMeshVBuffer();
@@ -48,7 +52,8 @@ class GraphicSystem : public ISystems
 		bool BuildInstanceBuffer();
 
 		bool UpdateFrameCBuffer( FrameData& newFrameData );
-		bool UpdateInstanceCBuffer( std::unique_ptr<ActorCollection>& actors, const size_t numActiveActors );
+		bool UpdateInstanceCBuffer( std::unique_ptr<ActorCollection>& actors,
+									const size_t numActiveActors );
 
 	public:
 		GraphicSystem();

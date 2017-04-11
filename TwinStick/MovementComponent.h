@@ -20,14 +20,14 @@ struct MovementComponent : public IComponent
 	MovementComponent( bool isMoving = false,
 					   float speed = 0.0f,
 					   DirectX::XMFLOAT3 velocity = DirectX::XMFLOAT3(),
-					   DirectX::XMFLOAT3 maxVelocity = DirectX::XMFLOAT3(),
+					   DirectX::XMFLOAT3 maxVelocity = DirectX::XMFLOAT3( 1.0f, 1.0f, 1.0f ),
 					   DirectX::XMFLOAT3 acceleration = DirectX::XMFLOAT3(),
-					   float maxAcceleration = 1.0f,
+					   float maxAcceleration = 0.1f,
 					   DirectX::XMFLOAT3 targetLocation = DirectX::XMFLOAT3(),
 					   DirectX::XMFLOAT3 targetRotation = DirectX::XMFLOAT3() )
 	{
 		this->isMoving			= isMoving;
-		this->speed				= speed;
+		this->speed				= speed * 3.0f;
 		this->velocity			= velocity;
 		this->maxVelocity		= maxVelocity;
 		this->acceleration		= acceleration;

@@ -37,7 +37,7 @@ bool Engine::Update( float deltaTime )
 
 bool Engine::InitializeSystems()
 {
-	mCameraSystem = std::make_unique<CameraSystem>( XMFLOAT3( 0.0f, 500.0f, -10.0f ) );
+	mCameraSystem = std::make_unique<CameraSystem>( XMFLOAT3( 0.0f, 200.0f, -450.0f ) );
 	if( !mCameraSystem )
 		return false;
 
@@ -247,8 +247,8 @@ const bool Engine::RequestActor( std::vector<std::unique_ptr<IComponent>>& compo
 {
 	if( !componentList.empty() && mNumActiveActors < GameGlobals::MAX_ACTORS )
 	{
-		const size_t& i = mNumActiveActors;
-		mActors->mIsActive[i] = true;
+		const size_t& i			= mNumActiveActors;
+		mActors->mIsActive[i]	= true;
 
 		// Set Components
 		for( auto& component : componentList )

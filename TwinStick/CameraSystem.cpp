@@ -25,7 +25,7 @@ CameraSystem::CameraSystem( const XMFLOAT3 cameraLocation, const XMFLOAT3 focusP
 	
 	mFollowedActorID			= 0;
 	mIsFollowingActor			= false;
-	mDistanceToFollowedActor	= XMVectorGetX( XMVector3Length( look ) );
+	mDistanceToFollowedActor	= 160.0f;
 
 	mMinCullDistance	= minDrawDistance;
 	mMaxCullDistance	= maxDrawDistance;
@@ -98,12 +98,15 @@ void CameraSystem::Translate( float deltaTime, DirectX::XMFLOAT3 direction )
 bool CameraSystem::Update( float deltaTime, std::unique_ptr<ActorCollection>& actors,
 						   size_t numActiveActor, void* systemSpecificInput )
 {
+	if( !actors )
+		return false;
+
 	XMStoreFloat3( &mRightVector, XMVector3Cross( XMLoadFloat3( &mLookVector ),
 												  XMVectorSet( 0.0f, -1.0f, 0.0f, 0.0f ) ) );
 	XMStoreFloat3( &mUpVector, XMVector3Cross( XMLoadFloat3( &mLookVector ),
 											   XMLoadFloat3( &mRightVector ) ) );
 
-	//Rotate( deltaTime, -2.0f );
+	//Rotate( deltaTime, -20.0f );
 
 	//Translate( deltaTime, XMFLOAT3( 0.0f, 1.0f, 0.0f ) );
 	
