@@ -13,22 +13,85 @@ using Microsoft::WRL::ComPtr;
 
 #define GRAPHIC_MASK ( EComponentType::Transform | EComponentType::Mesh )
 
+bool GraphicSystem::CreateRenderTargetView()
+{
+	HRESULT hr = E_FAIL;
+
+	ComPtr<ID3D11Texture2D> backBuffer = nullptr;
+	if ( SUCCEEDED( mSwapChain->GetBuffer( 0, __uuidof( ID3D11Texture2D ), (void**)&backBuffer ) ) )
+	{
+		hr = mDevice->CreateRenderTargetView( backBuffer.Get(), nullptr, mRenderTargetView.GetAddressOf() );
+
+	}
+
+	if( FAILED( hr ) )
+		return false;
+
+	return true;
+
+}
+
+bool GraphicSystem::CreateDepthStencilView()
+{
+	HRESULT hr = E_FAIL;
+
+	ComPtr<ID3D11Texture2D> depthStencil = nullptr;
+
+	D3D11_TEXTURE2D_DESC dsd;
+	dsd.Width				= Resolution::SCREEN_WIDTH;
+	dsd.Height				= Resolution::SCREEN_HEIGHT;
+	dsd.MipLevels			= 1;
+	dsd.ArraySize			= 1;
+	dsd.Format				= DXGI_FORMAT_D32_FLOAT;
+	dsd.SampleDesc.Count	= 1;
+	dsd.SampleDesc.Quality	= 0;
+	dsd.Usage				= D3D11_USAGE_DEFAULT;
+	dsd.BindFlags			= D3D11_BIND_DEPTH_STENCIL;
+	dsd.CPUAccessFlags		= 0;
+	dsd.MiscFlags			= 0;
+
+	if( FAILED( mDevice->CreateTexture2D( &dsd, nullptr, depthStencil.GetAddressOf() ) ) )
+		return false;
+
+	D3D11_DEPTH_STENCIL_VIEW_DESC dsvd;
+	ZeroMemory( &dsvd, sizeof( dsvd ) );
+	dsvd.Format				= dsd.Format;
+	dsvd.ViewDimension		= D3D11_DSV_DIMENSION_TEXTURE2DMS;
+	dsvd.Texture2D.MipSlice	= 0;
+
+	if( FAILED( mDevice->CreateDepthStencilView( depthStencil.Get(), &dsvd, mDepthStencilView.GetAddressOf() ) ) )
+		return hr;
+
+	return true;
+
+}
+
+bool GraphicSystem::CreateRasterizerState()
+{
+	HRESULT hr = E_FAIL;
+
+	D3D11_RASTERIZER_DESC desc;
+	memset( &desc, 0, sizeof( desc ) );
+	desc.FillMode			= D3D11_FILL_SOLID;
+	desc.CullMode			= D3D11_CULL_BACK;
+	desc.DepthClipEnable	= true;
+
+	if( FAILED( mDevice->CreateRasterizerState( &desc, mRasterizerState.GetAddressOf() ) ) )
+		return false;
+
+	return true;
+
+}
+
 bool GraphicSystem::InitializeDirectXComponents()
 {
 	RECT rc;
 	GetWindowRect( mWindowHandle, &rc );
 
-	//AdjustWindowRect( &rc, WS_OVERLAPPEDWINDOW, FALSE );
-
 	int border = 12;
-
 	int width	= rc.right - rc.left - border;
 	int height	= rc.bottom - rc.top - border;
 
-
-
-
-	// Create Device, Device Context and Swap Chain
 	D3D_DRIVER_TYPE driverTypes[] = { D3D_DRIVER_TYPE_HARDWARE,
 		D3D_DRIVER_TYPE_WARP,
 		D3D_DRIVER_TYPE_REFERENCE };
@@ -71,64 +134,20 @@ bool GraphicSystem::InitializeDirectXComponents()
 	if( FAILED( hr ) )
 		return hr;
 
-	// Create Render Target View
-	ComPtr<ID3D11Texture2D> backBuffer = nullptr;
-	if ( SUCCEEDED( mSwapChain->GetBuffer( 0, __uuidof( ID3D11Texture2D ), (void**)&backBuffer ) ) )
-	{
-		hr = mDevice->CreateRenderTargetView( backBuffer.Get(), nullptr, mRenderTargetView.GetAddressOf() );
 
-	}
-
-	if( FAILED( hr ) )
+	if( !CreateRenderTargetView() )
+		return false;
+	if( !CreateDepthStencilView() )
+		return false;
+	if( !CreateRasterizerState() )
 		return false;
 
-
-	// Create Depth Stencil View
-	ComPtr<ID3D11Texture2D> depthStencil = nullptr;
-
-	D3D11_TEXTURE2D_DESC dsd;
-	dsd.Width				= Resolution::SCREEN_WIDTH;
-	dsd.Height				= Resolution::SCREEN_HEIGHT;
-	dsd.MipLevels			= 1;
-	dsd.ArraySize			= 1;
-	dsd.Format				= DXGI_FORMAT_D32_FLOAT;
-	dsd.SampleDesc.Count	= 1;
-	dsd.SampleDesc.Quality	= 0;
-	dsd.Usage				= D3D11_USAGE_DEFAULT;
-	dsd.BindFlags			= D3D11_BIND_DEPTH_STENCIL;
-	dsd.CPUAccessFlags		= 0;
-	dsd.MiscFlags			= 0;
-
-	if( FAILED( mDevice->CreateTexture2D( &dsd, nullptr, depthStencil.GetAddressOf() ) ) )
-		return false;
-
-	D3D11_DEPTH_STENCIL_VIEW_DESC dsvd;
-	ZeroMemory( &dsvd, sizeof( dsvd ) );
-	dsvd.Format				= dsd.Format;
-	dsvd.ViewDimension		= D3D11_DSV_DIMENSION_TEXTURE2DMS;
-	dsvd.Texture2D.MipSlice	= 0;
-
-	if( FAILED( mDevice->CreateDepthStencilView( depthStencil.Get(), &dsvd, mDepthStencilView.GetAddressOf() ) ) )
-		return hr;
-
-	SetViewport();
-
-	// Create Rasterizer State
-	D3D11_RASTERIZER_DESC desc;
-	memset( &desc, 0, sizeof( desc ) );
-	desc.FillMode			= D3D11_FILL_SOLID;
-	desc.CullMode			= D3D11_CULL_BACK;
-	desc.DepthClipEnable	= true;
-
-	if( FAILED( mDevice->CreateRasterizerState( &desc, mRasterizerState.GetAddressOf() ) ) )
-		return false;
 
 	return true;
 }
 
 bool GraphicSystem::InitializeShaders()
 {
-	// Compile Vertex Shader
 	ComPtr<ID3DBlob> vs = nullptr;
 	if ( CompileShader( "Shader.hlsl", "VertexShaderMain", "vs_5_0", nullptr, vs.GetAddressOf() ) )
 	{
@@ -157,7 +176,7 @@ bool GraphicSystem::InitializeShaders()
 
 		}
 
-		// Compile Pixel Shader
+
 		ComPtr<ID3DBlob> ps = nullptr;
 
 		if( CompileShader( "Shader.hlsl", "PixelShaderMain", "ps_5_0", nullptr, ps.GetAddressOf() ) )
@@ -177,7 +196,7 @@ bool GraphicSystem::InitializeShaders()
 
 bool GraphicSystem::CompileShader( char* shaderFile, char* pEntrypoint, char* pTarget, D3D10_SHADER_MACRO* pDefines, ID3DBlob** pCompiledShader )
 {
-	DWORD dwShaderFlags =	D3DCOMPILE_ENABLE_STRICTNESS | 
+	DWORD dwShaderFlags = D3DCOMPILE_ENABLE_STRICTNESS | 
 		D3DCOMPILE_IEEE_STRICTNESS | D3DCOMPILE_DEBUG;
 
 	std::string shader_code;
@@ -220,23 +239,17 @@ void GraphicSystem::BeginFrame()
 	mDeviceContext->OMSetRenderTargets( 1, mRenderTargetView.GetAddressOf(), mDepthStencilView.Get() );
 	
 
-	// Set VertexData buffer and InstanceData buffer
 	UINT32 stride[2]				= { sizeof(Vertex32), sizeof(InstanceData) };
 	UINT32 offset[2]				= { 0, 0 };
-	ID3D11Buffer* buffersToSet[2]	= { mBuffers[static_cast<size_t>(EBufferType::Vertex)].Get() ,
+	ID3D11Buffer* buffersToSet[2]	= { mBuffers[static_cast<size_t>( EBufferType::Vertex )].Get() ,
 										mBuffers[static_cast<size_t>( EBufferType::Instance )].Get() };
 	mDeviceContext->IASetVertexBuffers( 0, 2, buffersToSet, stride, offset );
 	mDeviceContext->VSSetConstantBuffers( 0, 1, mBuffers[static_cast<size_t>( EBufferType::Frame )].GetAddressOf() );
 	
 
-
-
-
-
 	mDeviceContext->RSSetState( mRasterizerState.Get() );
 	mDeviceContext->IASetInputLayout( mInputLayout.Get() );
 	mDeviceContext->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
-
 
 
 	mDeviceContext->VSSetShader( mVertexShader.Get(), nullptr, 0 );
@@ -247,22 +260,19 @@ void GraphicSystem::BeginFrame()
 
 void GraphicSystem::EndFrame()
 {
-	// Swap Front and Back Buffer
 	mSwapChain->Present( 1, 0 );
 	mDeviceContext->ClearState();
 
 }
 
-bool GraphicSystem::Render( const size_t numActiveActors )
+void GraphicSystem::Render( const size_t numActiveActors )
 {
 	BeginFrame();
 
-	// Render Components;
 	mDeviceContext->DrawInstanced( static_cast<UINT>( mCubeMesh->vertices.size() ),
-								   static_cast<UINT>(numActiveActors), 0, 0 );
+								   static_cast<UINT>( numActiveActors ), 0, 0 );
 
 	EndFrame();
-	return true;
 	
 }
 
@@ -304,7 +314,7 @@ bool GraphicSystem::BuildMeshVBuffer()
 	vinitData.pSysMem			= &mCubeMesh->vertices[0];
 
 	if( FAILED( mDevice->CreateBuffer( &vbd, &vinitData,
-									   mBuffers[static_cast<size_t>(EBufferType::Vertex)].GetAddressOf() ) ) )
+									   mBuffers[static_cast<size_t>( EBufferType::Vertex )].GetAddressOf() ) ) )
 		return false;
 
 	return true;
@@ -321,7 +331,7 @@ bool GraphicSystem::BuildFrameCBuffer()
 	cbDesc.StructureByteStride	= 0;
 
 	if( FAILED ( mDevice->CreateBuffer( &cbDesc, nullptr,
-										mBuffers[static_cast<size_t>(EBufferType::Frame)].GetAddressOf() ) ) )
+										mBuffers[static_cast<size_t>( EBufferType::Frame )].GetAddressOf() ) ) )
 		return false;
 
 	return true;
@@ -338,7 +348,7 @@ bool GraphicSystem::BuildInstanceBuffer()
 	ibDesc.StructureByteStride	= 0;
 
 	if( FAILED( mDevice->CreateBuffer( &ibDesc, nullptr,
-									   mBuffers[static_cast<size_t>(EBufferType::Instance)].GetAddressOf() ) ) )
+									   mBuffers[static_cast<size_t>( EBufferType::Instance )].GetAddressOf() ) ) )
 		return false;
 
 	return true;
@@ -347,12 +357,12 @@ bool GraphicSystem::BuildInstanceBuffer()
 bool GraphicSystem::UpdateFrameCBuffer( FrameData &newFrameData )
 {
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
-	HRESULT hr = mDeviceContext->Map( mBuffers[static_cast<size_t>(EBufferType::Frame)].Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource );
+	HRESULT hr = mDeviceContext->Map( mBuffers[static_cast<size_t>( EBufferType::Frame )].Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource );
 
 	if( SUCCEEDED( hr ) )
 	{
 		memcpy( mappedResource.pData, &newFrameData, sizeof(FrameData) );
-		mDeviceContext->Unmap( mBuffers[static_cast<size_t>(EBufferType::Frame)].Get(), 0 );
+		mDeviceContext->Unmap( mBuffers[static_cast<size_t>( EBufferType::Frame )].Get(), 0 );
 	}
 	else
 		return false;
@@ -391,14 +401,14 @@ bool GraphicSystem::UpdateInstanceCBuffer( std::unique_ptr<ActorCollection>& act
 		if( !actorWorldMatrices.empty() )
 		{
 			D3D11_MAPPED_SUBRESOURCE mappedResource;
-			HRESULT hr = mDeviceContext->Map( mBuffers[static_cast<size_t>(EBufferType::Instance)].Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource );
-
-			
+			HRESULT hr = mDeviceContext->Map( mBuffers[static_cast<size_t>( EBufferType::Instance )].Get(),
+											  0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource );
+	
 			if( SUCCEEDED( hr ) )
 			{
 
 				memcpy( mappedResource.pData, &actorWorldMatrices[0], sizeof(InstanceData) * actorWorldMatrices.size() );
-				mDeviceContext->Unmap( mBuffers[static_cast<size_t>(EBufferType::Instance)].Get(), 0 ); 
+				mDeviceContext->Unmap( mBuffers[static_cast<size_t>( EBufferType::Instance )].Get(), 0 ); 
 			}
 			else
 				return false;
@@ -422,7 +432,7 @@ GraphicSystem::GraphicSystem()
 	mRasterizerState	= nullptr;
 	mSamplerState		= nullptr;
 
-	for( size_t i = 0; i < static_cast<size_t>(EBufferType::NumBufferTypes); i++ )
+	for( size_t i = 0; i < static_cast<size_t>( EBufferType::NumBufferTypes ); i++ )
 		mBuffers.push_back( nullptr );
 
 	mCubeMesh			= nullptr;
@@ -452,9 +462,6 @@ bool GraphicSystem::Initialize( HWND& windowHandle )
 	if( !BuildInstanceBuffer() )
 		return false;
 
-	
-
-
 	return true;
 
 }
@@ -471,11 +478,7 @@ bool GraphicSystem::Update( float deltaTime, std::unique_ptr<ActorCollection>& a
 	if( !UpdateInstanceCBuffer( actors, numActiveActors ) )
 		return false;
 	
-	if( !Render( numActiveActors ) )
-		return false;
-
-	
-
+	Render( numActiveActors );
 	return true;
 
 }
