@@ -98,6 +98,9 @@ void CameraSystem::Translate( float deltaTime, DirectX::XMFLOAT3 direction )
 bool CameraSystem::Update( float deltaTime, std::unique_ptr<ActorCollection>& actors,
 						   size_t numActiveActor, void* systemSpecificInput )
 {
+	if( !actors )
+		return false;
+
 	XMStoreFloat3( &mRightVector, XMVector3Cross( XMLoadFloat3( &mLookVector ),
 												  XMVectorSet( 0.0f, -1.0f, 0.0f, 0.0f ) ) );
 	XMStoreFloat3( &mUpVector, XMVector3Cross( XMLoadFloat3( &mLookVector ),

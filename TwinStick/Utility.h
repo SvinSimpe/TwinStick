@@ -9,10 +9,10 @@ namespace GameGlobals
 
 	namespace WorldBounds
 	{
-		constexpr float WIDTH_MIN = -500.0f;
-		constexpr float WIDTH_MAX = 500.0f;
-		constexpr float DEPTH_MIN = -200.0f;
-		constexpr float DEPTH_MAX = 500.0f;;
+		constexpr float X_MIN = -50.0f;
+		constexpr float X_MAX = 50.0f;
+		constexpr float Z_MIN = -20.0f;
+		constexpr float Z_MAX = 50.0f;;
 
 	}
 
@@ -57,7 +57,7 @@ inline constexpr DirectX::XMFLOAT3 Vector3Truncate( const DirectX::XMFLOAT3& v, 
 
 }
 
-inline constexpr DirectX::XMFLOAT3 Vector3Truncate( const DirectX::XMFLOAT3& v, const float min, const float max ) noexcept
+inline constexpr DirectX::XMFLOAT3 Vector3Clamp( const DirectX::XMFLOAT3& v, const float min, const float max ) noexcept
 {
 	return DirectX::XMFLOAT3( ( v.x < 0.0f ) ? /*neg*/ ( ( v.x > min ) ? v.x : min ) : /*pos*/ ( ( v.x < max ) ? v.x : max ), 
 								( v.y < 0.0f ) ? /*neg*/ ( ( v.y > min ) ? v.y : min ) : /*pos*/ ( ( v.y < max ) ? v.y : max ), 

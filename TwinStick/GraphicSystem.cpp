@@ -116,7 +116,7 @@ bool GraphicSystem::InitializeDirectXComponents()
 	// Create Rasterizer State
 	D3D11_RASTERIZER_DESC desc;
 	memset( &desc, 0, sizeof( desc ) );
-	desc.FillMode			= D3D11_FILL_WIREFRAME;
+	desc.FillMode			= D3D11_FILL_SOLID;
 	desc.CullMode			= D3D11_CULL_BACK;
 	desc.DepthClipEnable	= true;
 
@@ -462,7 +462,9 @@ bool GraphicSystem::Initialize( HWND& windowHandle )
 bool GraphicSystem::Update( float deltaTime, std::unique_ptr<ActorCollection>& actors,
 							size_t numActiveActors, void* systemSpecificInput )
 {
-	
+	if( !actors )
+		return false;
+
 	if( !UpdateFrameCBuffer( *( static_cast<FrameData*>( systemSpecificInput ) ) ) )
 		return false;
 	

@@ -12,7 +12,7 @@ int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdL
 		return 0;
 
 
-	for( size_t i = 0; i < 30; i++ )
+	for( size_t i = 0; i < 25; i++ )
 	{
 		std::vector<std::unique_ptr<IComponent>> componentList;
 		std::unique_ptr<TransformComponent> transform = std::make_unique<TransformComponent>();
@@ -21,9 +21,13 @@ int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdL
 		std::unique_ptr<MovementComponent> movement = std::make_unique<MovementComponent>();
 		std::unique_ptr<SteeringBehaviourComponent> steeringBehaviour = std::make_unique<SteeringBehaviourComponent>();
 
-		movement->targetLocation = XMFLOAT3( RandomFloatInRange( -200.0f, 200.0f ), 0.0f, RandomFloatInRange( -200.0f, 200.0f ) );
 		movement->velocity = XMFLOAT3( 0.0f, 0.0f, 1.0f );
 		
+		movement->targetLocation = XMFLOAT3( RandomFloatInRange( GameGlobals::WorldBounds::X_MIN,
+																 GameGlobals::WorldBounds::X_MAX ),
+											 0.0f,
+											 RandomFloatInRange( GameGlobals::WorldBounds::Z_MIN,
+																 GameGlobals::WorldBounds::Z_MAX ) );
 		
 		switch( i % 5 )
 		{
@@ -41,6 +45,8 @@ int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdL
 				movement->speed = 40.0f;		
 				transform->scale = XMFLOAT3( 3.0f, 5.0f, 3.0f );
 				break;
+
+
 			}
 			case 2:
 			{
@@ -67,7 +73,16 @@ int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdL
 				break;
 		}
 		
+		if( i == 0 )
+		{ 
+			mesh->color = XMFLOAT4( 1.0f, 0.0f, 0.0f, 1.0f );
+			movement->speed = 20.0f;
+			transform->location = XMFLOAT3( 100.0f, 0.0f, -200.0f );
+		}
+
 		steeringBehaviour->mass = XMVectorGetX( XMVector3Length( XMLoadFloat3( &transform->scale ) ) );
+		steeringBehaviour->state = ESteeringBehaviourState::Wander;
+
 
 		componentList.push_back( std::move( transform ) );
 		componentList.push_back( std::move( mesh ) );
