@@ -7,11 +7,9 @@ enum class EComponentType : std::uint32_t
 	None				= 0,
 	Transform			= 1 << 0,
 	Movement			= 1 << 1,
-	Collider			= 1 << 2,
-	Render				= 1 << 3,
-	Mesh				= 1 << 4,
-	SteeringBehaviour	= 1 << 5,
-	Health				= 1 << 6,
+	Mesh				= 1 << 2,
+	SteeringBehaviour	= 1 << 3,
+	Health				= 1 << 4
 
 };
 
