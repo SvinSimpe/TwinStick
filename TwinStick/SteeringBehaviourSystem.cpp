@@ -7,8 +7,8 @@ using namespace DirectX;
 
 namespace SteeringBehaviourConstants
 {
-	const float MIN_WANDER_TIME					= 0.1f;
-	const float MAX_WANDER_TIME					= 8.0f;
+	const float MIN_WANDER_TIME					= 0.5f;
+	const float MAX_WANDER_TIME					= 3.0f;
 	const float THREAT_DISTANCE_SQUARED			= 100.0f * 100.0f;
 	const float PREFERED_SAFE_DISTANCE_SQUARED	= 120.0f * 120.0f;
 	const float ARRIVAL_RADIUS_SQUARED			= 35.0f * 35.0f;

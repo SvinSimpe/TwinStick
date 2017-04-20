@@ -12,7 +12,7 @@ int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdL
 		return 0;
 
 
-	for( size_t i = 0; i < 25; i++ )
+	for( size_t i = 0; i < 250; i++ )
 	{
 		std::vector<std::unique_ptr<IComponent>> componentList;
 		std::unique_ptr<TransformComponent> transform = std::make_unique<TransformComponent>();
