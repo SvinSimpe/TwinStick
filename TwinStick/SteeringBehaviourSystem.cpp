@@ -34,8 +34,12 @@ void SteeringBehaviourSystem::CalculateActorSteeringAndVelocity( std::unique_ptr
 											  moveComp->maxAcceleration * -1.0f,
 											  moveComp->maxAcceleration );
 
-	if( steerComp->mass == 0.0f )
+	if( steerComp->mass <= 0.0f )
+	{
+		OutputDebugStringA( "Warning: SteeringComponent mass was non-valid! Resetting mass to 1.0." );
 		steerComp->mass = 1.0f;
+	}
+		
 
 	XMStoreFloat3( &moveComp->acceleration, XMLoadFloat3( &steerComp->steeringVector ) / steerComp->mass );
 	XMStoreFloat3( &moveComp->velocity, XMLoadFloat3( &moveComp->velocity ) +
