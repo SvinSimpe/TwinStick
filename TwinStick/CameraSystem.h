@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "ISystems.h"
 #include <DirectXMath.h>
@@ -12,12 +12,10 @@ class CameraSystem : public ISystems
 		DirectX::XMFLOAT3 mLookVector;
 		DirectX::XMFLOAT3 mUpVector;
 		DirectX::XMFLOAT3 mRightVector;
-		
-
+	
 		DirectX::XMFLOAT4X4 mViewMatrix;
 		DirectX::XMFLOAT4X4 mProjectionMatrix;
 		
-
 		size_t	mFollowedActorID;
 		bool	mIsFollowingActor;
 		float	mDistanceToFollowedActor;
@@ -31,7 +29,7 @@ class CameraSystem : public ISystems
 		
 
 	public:
-		//CameraSystem();
+	//CameraSystem(){};
 		CameraSystem( const DirectX::XMFLOAT3 cameraLocation = DirectX::XMFLOAT3( 10.0f, 10.0f, -10.0f ),
 					  const DirectX::XMFLOAT3 focusPoint = DirectX::XMFLOAT3( 0.0f, 0.0f, 0.0f ), 
 					  const float minCullDistance = 0.5f,

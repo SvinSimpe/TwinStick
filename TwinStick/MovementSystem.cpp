@@ -1,4 +1,4 @@
-#include "MovementSystem.h"
+﻿#include "MovementSystem.h"
 #include "Utility.h"
 #include "stdafx.h"
 
@@ -21,7 +21,7 @@ bool MovementSystem::Update( float deltaTime, std::unique_ptr<ActorCollection>& 
 	for( size_t i = 0; i < numActiveActors; i++ )
 	{
 		if( actors->mIsActive[i] &&
-			( actors->componentMasks[i] & MOVEMENT_MASK ) == MOVEMENT_MASK )
+			( actors->mComponentMasks[i] & MOVEMENT_MASK ) == MOVEMENT_MASK )
 		{
 			std::unique_ptr<TransformComponent>& transformComp		= actors->mTransformComponents[i];
 			std::unique_ptr<MovementComponent>& moveComp			= actors->mMovementComponents[i];

@@ -1,4 +1,4 @@
-#include "SteeringBehaviourSystem.h"
+﻿#include "SteeringBehaviourSystem.h"
 #include "Utility.h"
 #include "stdafx.h"
 #include <DirectXMath.h>
@@ -58,7 +58,7 @@ bool SteeringBehaviourSystem::Update( float deltaTime, std::unique_ptr<ActorColl
 	for( size_t i = 0; i < numActiveActors; i++ )
 	{
 		if( actors->mIsActive[i] &&
-			( actors->componentMasks[i] & BEHAVIOUR_MASK ) == BEHAVIOUR_MASK )
+			( actors->mComponentMasks[i] & BEHAVIOUR_MASK ) == BEHAVIOUR_MASK )
 		{
 			std::unique_ptr<TransformComponent>& transformComp		= actors->mTransformComponents[i];
 			std::unique_ptr<MovementComponent>& moveComp			= actors->mMovementComponents[i];
