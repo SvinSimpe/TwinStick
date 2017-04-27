@@ -1,4 +1,4 @@
-#include "GraphicSystem.h"
+﻿#include "GraphicSystem.h"
 #include "Utility.h"
 #include <DirectXColors.h>
 #include "ActorCollection.h"
@@ -380,7 +380,7 @@ bool GraphicSystem::UpdateInstanceCBuffer( std::unique_ptr<ActorCollection>& act
 		for( size_t i = 0; i < numActiveActor; i++ )
 		{
 			if( actors->mIsActive[i] &&
-				( actors->componentMasks[i] & GRAPHIC_MASK ) == GRAPHIC_MASK )
+				( actors->mComponentMasks[i] & GRAPHIC_MASK ) == GRAPHIC_MASK )
 			{ 			
 				TransformComponent& actorTransform = *actors->mTransformComponents[i];
 

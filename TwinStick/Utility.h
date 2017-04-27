@@ -9,10 +9,10 @@ namespace GameGlobals
 
 	namespace WorldBounds
 	{
-		constexpr float X_MIN = -50.0f;
-		constexpr float X_MAX = 50.0f;
-		constexpr float Z_MIN = -20.0f;
-		constexpr float Z_MAX = 50.0f;;
+		constexpr float X_MIN = -500.0f;
+		constexpr float X_MAX = 500.0f;
+		constexpr float Z_MIN = -200.0f;
+		constexpr float Z_MAX = 500.0f;;
 
 	}
 

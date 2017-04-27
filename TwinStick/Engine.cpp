@@ -1,4 +1,4 @@
-#include "Engine.h"
+﻿#include "Engine.h"
 #include "Utility.h"
 
 Engine* gEngine = 0;
@@ -64,7 +64,7 @@ bool Engine::InitializeActors()
 		mActors = std::make_unique<ActorCollection>();
 
 		mActors->mIsActive.reserve( GameGlobals::MAX_ACTORS );
-		mActors->componentMasks.reserve( GameGlobals::MAX_ACTORS );
+		mActors->mComponentMasks.reserve( GameGlobals::MAX_ACTORS );
 		mActors->mTransformComponents.reserve( GameGlobals::MAX_ACTORS );
 		mActors->mMeshComponents.reserve( GameGlobals::MAX_ACTORS );
 		mActors->mHealthComponents.reserve( GameGlobals::MAX_ACTORS );
@@ -74,7 +74,7 @@ bool Engine::InitializeActors()
 		for( size_t i = 0; i < GameGlobals::MAX_ACTORS; i++ )
 		{
 			mActors->mIsActive.push_back( false );
-			mActors->componentMasks.push_back( 0 );
+			mActors->mComponentMasks.push_back( 0 );
 			mActors->mTransformComponents.push_back( std::make_unique<TransformComponent>() );
 			mActors->mMeshComponents.push_back( std::make_unique<MeshComponent>() );
 			mActors->mHealthComponents.push_back( std::make_unique<HealthComponent>() );
@@ -99,7 +99,7 @@ void Engine::CheckInactiveActors()
 		if( !mActors->mIsActive[i] )
 		{
 			std::swap( mActors->mIsActive[i], mActors->mIsActive[mNumActiveActors] );
-			std::swap( mActors->componentMasks[i], mActors->componentMasks[mNumActiveActors] );
+			std::swap( mActors->mComponentMasks[i], mActors->mComponentMasks[mNumActiveActors] );
 			mActors->mTransformComponents[i].swap( mActors->mTransformComponents[mNumActiveActors] );
 			mActors->mMovementComponents[i].swap( mActors->mMovementComponents[mNumActiveActors] );
 			mNumActiveActors--;
@@ -259,8 +259,8 @@ const bool Engine::RequestActor( std::vector<std::unique_ptr<IComponent>>& compo
 				{
 					if( mActors->mTransformComponents[mNumActiveActors]->Set( component ) )
 					{
-						mActors->componentMasks[i] = static_cast<size_t>( 
-							mActors->componentMasks[i] | EComponentType::Transform );
+						mActors->mComponentMasks[i] = static_cast<size_t>( 
+							mActors->mComponentMasks[i] | EComponentType::Transform );
 					}
 					else
 						OutputDebugString( "Error: Unable to set TransformComponent data" );
@@ -271,8 +271,8 @@ const bool Engine::RequestActor( std::vector<std::unique_ptr<IComponent>>& compo
 				{
 					if( mActors->mMeshComponents[mNumActiveActors]->Set( component ) )
 					{
-						mActors->componentMasks[i] = static_cast<size_t>( 
-							mActors->componentMasks[i] | EComponentType::Mesh );
+						mActors->mComponentMasks[i] = static_cast<size_t>( 
+							mActors->mComponentMasks[i] | EComponentType::Mesh );
 					}
 					else
 						OutputDebugString( "Error: Unable to set MeshComponent data" );
@@ -283,8 +283,8 @@ const bool Engine::RequestActor( std::vector<std::unique_ptr<IComponent>>& compo
 				{
 					if( mActors->mHealthComponents[mNumActiveActors]->Set( component ) )
 					{
-						mActors->componentMasks[i] = static_cast<size_t>( 
-							mActors->componentMasks[i] | EComponentType::Health );
+						mActors->mComponentMasks[i] = static_cast<size_t>( 
+							mActors->mComponentMasks[i] | EComponentType::Health );
 					}
 					else
 						OutputDebugString( "Error: Unable to set HealthComponent data" );
@@ -295,8 +295,8 @@ const bool Engine::RequestActor( std::vector<std::unique_ptr<IComponent>>& compo
 				{
 					if( mActors->mMovementComponents[mNumActiveActors]->Set( component ) )
 					{
-						mActors->componentMasks[i] = static_cast<size_t>( 
-							mActors->componentMasks[i] | EComponentType::Movement );
+						mActors->mComponentMasks[i] = static_cast<size_t>( 
+							mActors->mComponentMasks[i] | EComponentType::Movement );
 					}
 					else
 						OutputDebugString( "Error: Unable to set MovementComponent data" );
@@ -307,8 +307,8 @@ const bool Engine::RequestActor( std::vector<std::unique_ptr<IComponent>>& compo
 				{
 					if( mActors->mSteeringBehaviorComponents[mNumActiveActors]->Set( component ) )
 					{
-						mActors->componentMasks[i] = static_cast<size_t>( 
-							mActors->componentMasks[i] | EComponentType::SteeringBehaviour );
+						mActors->mComponentMasks[i] = static_cast<size_t>( 
+							mActors->mComponentMasks[i] | EComponentType::SteeringBehaviour );
 					}
 					else
 						OutputDebugString( "Error: Unable to set SteeringBehaviourComponent data" );

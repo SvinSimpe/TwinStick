@@ -12,11 +12,12 @@
 struct ActorCollection
 {
 	std::vector<bool>	mIsActive;
-	std::vector<size_t>	componentMasks;
+	std::vector<size_t>	mComponentMasks;
 
 	std::vector<std::unique_ptr<TransformComponent>>			mTransformComponents;
 	std::vector<std::unique_ptr<MeshComponent>>					mMeshComponents;
 	std::vector<std::unique_ptr<HealthComponent>>				mHealthComponents;
 	std::vector<std::unique_ptr<MovementComponent>>				mMovementComponents;
 	std::vector<std::unique_ptr<SteeringBehaviourComponent>>	mSteeringBehaviorComponents;
+
 };

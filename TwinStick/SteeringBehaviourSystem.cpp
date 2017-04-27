@@ -1,4 +1,4 @@
-#include "SteeringBehaviourSystem.h"
+﻿#include "SteeringBehaviourSystem.h"
 #include "Utility.h"
 #include "stdafx.h"
 #include <DirectXMath.h>
@@ -7,8 +7,8 @@ using namespace DirectX;
 
 namespace SteeringBehaviourConstants
 {
-	const float MIN_WANDER_TIME					= 0.1f;
-	const float MAX_WANDER_TIME					= 8.0f;
+	const float MIN_WANDER_TIME					= 0.5f;
+	const float MAX_WANDER_TIME					= 3.0f;
 	const float THREAT_DISTANCE_SQUARED			= 100.0f * 100.0f;
 	const float PREFERED_SAFE_DISTANCE_SQUARED	= 120.0f * 120.0f;
 	const float ARRIVAL_RADIUS_SQUARED			= 35.0f * 35.0f;
@@ -34,8 +34,12 @@ void SteeringBehaviourSystem::CalculateActorSteeringAndVelocity( std::unique_ptr
 											  moveComp->maxAcceleration * -1.0f,
 											  moveComp->maxAcceleration );
 
-	if( steerComp->mass == 0.0f )
+	if( steerComp->mass <= 0.0f )
+	{
+		OutputDebugStringA( "Warning: SteeringComponent mass was non-valid! Resetting mass to 1.0." );
 		steerComp->mass = 1.0f;
+	}
+		
 
 	XMStoreFloat3( &moveComp->acceleration, XMLoadFloat3( &steerComp->steeringVector ) / steerComp->mass );
 	XMStoreFloat3( &moveComp->velocity, XMLoadFloat3( &moveComp->velocity ) +
@@ -58,7 +62,7 @@ bool SteeringBehaviourSystem::Update( float deltaTime, std::unique_ptr<ActorColl
 	for( size_t i = 0; i < numActiveActors; i++ )
 	{
 		if( actors->mIsActive[i] &&
-			( actors->componentMasks[i] & BEHAVIOUR_MASK ) == BEHAVIOUR_MASK )
+			( actors->mComponentMasks[i] & BEHAVIOUR_MASK ) == BEHAVIOUR_MASK )
 		{
 			std::unique_ptr<TransformComponent>& transformComp		= actors->mTransformComponents[i];
 			std::unique_ptr<MovementComponent>& moveComp			= actors->mMovementComponents[i];

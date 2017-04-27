@@ -1,4 +1,4 @@
-#include "CameraSystem.h"
+﻿#include "CameraSystem.h"
 #include "ActorCollection.h"
 #include "Utility.h"
 
@@ -119,7 +119,7 @@ bool CameraSystem::Update( float deltaTime, std::unique_ptr<ActorCollection>& ac
 	if( mIsFollowingActor )
 	{
 		if( actors->mIsActive[mFollowedActorID] &&
-			( actors->componentMasks[mFollowedActorID] & CAMERA_MASK ) == CAMERA_MASK )
+			( actors->mComponentMasks[mFollowedActorID] & CAMERA_MASK ) == CAMERA_MASK )
 		{
 			std::unique_ptr<TransformComponent>& actorTransform = 
 				actors->mTransformComponents[mFollowedActorID];
