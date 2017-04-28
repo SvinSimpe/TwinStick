@@ -80,7 +80,7 @@ bool SteeringBehaviourSystem::Update( float deltaTime, std::unique_ptr<ActorColl
 							SteeringBehaviourConstants::THREAT_DISTANCE_SQUARED )
 						{
 							steerComp->state = ESteeringBehaviourState::Flee;
-							moveComp->targetLocation = actors->mTransformComponents[0]->location;
+							XMStoreFloat3( &moveComp->targetLocation, playerLocation );
 						}
 
 					}
