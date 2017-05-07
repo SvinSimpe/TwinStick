@@ -7,11 +7,11 @@ using namespace DirectX;
 
 namespace SteeringBehaviourConstants
 {
-	const float MIN_WANDER_TIME					= 0.5f;
-	const float MAX_WANDER_TIME					= 3.0f;
-	const float THREAT_DISTANCE_SQUARED			= 100.0f * 100.0f;
-	const float PREFERED_SAFE_DISTANCE_SQUARED	= 120.0f * 120.0f;
-	const float ARRIVAL_RADIUS_SQUARED			= 35.0f * 35.0f;
+	constexpr float MIN_WANDER_TIME					= 0.5f;
+	constexpr float MAX_WANDER_TIME					= 3.0f;
+	constexpr float THREAT_DISTANCE_SQUARED			= 100.0f * 100.0f;
+	constexpr float PREFERED_SAFE_DISTANCE_SQUARED	= 120.0f * 120.0f;
+	constexpr float ARRIVAL_RADIUS_SQUARED			= 35.0f * 35.0f;
 
 }
 
@@ -122,7 +122,7 @@ bool SteeringBehaviourSystem::Update( float deltaTime, std::unique_ptr<ActorColl
 				{
 					float distanceToTargetSquared = XMVectorGetX( 
 						XMVector3LengthSq( XMLoadFloat3( &moveComp->targetLocation ) -
-											XMLoadFloat3( &transformComp->location ) ) );
+										   XMLoadFloat3( &transformComp->location ) ) );
 					
 					float arrivalForce = MapToRange( distanceToTargetSquared,
 													 0.0f, SteeringBehaviourConstants::ARRIVAL_RADIUS_SQUARED,

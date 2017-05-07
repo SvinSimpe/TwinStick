@@ -1,6 +1,6 @@
-#pragma once
+﻿#pragma once
 
-#include <memory>
+//#include <memory>
 
 enum class EBufferType : std::uint32_t
 {
