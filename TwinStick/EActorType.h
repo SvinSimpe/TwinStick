@@ -1,7 +1,8 @@
-#pragma once
+﻿#pragma once
 
 enum class EActorType
 {
+	None,
 	Player,
 	Enemy
 

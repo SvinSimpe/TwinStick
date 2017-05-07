@@ -1,18 +1,21 @@
-#pragma once
+﻿#pragma once
 
 #include <vector>
 #include <memory>
 
+#include "EActorType.h"
 #include "TransformComponent.h"
 #include "MeshComponent.h"
 #include "MovementComponent.h"
 #include "HealthComponent.h"
 #include "SteeringBehaviourComponent.h"
 
+
 struct ActorCollection
 {
-	std::vector<bool>	mIsActive;
-	std::vector<size_t>	mComponentMasks;
+	std::vector<bool>		mIsActive;
+	std::vector<size_t>		mComponentMasks;
+	std::vector<EActorType>	mActorType;
 
 	std::vector<std::unique_ptr<TransformComponent>>			mTransformComponents;
 	std::vector<std::unique_ptr<MeshComponent>>					mMeshComponents;
