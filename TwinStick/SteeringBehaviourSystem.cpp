@@ -74,13 +74,14 @@ bool SteeringBehaviourSystem::Update( float deltaTime, std::unique_ptr<ActorColl
 			{
 				case ESteeringBehaviourState::Wander :
 				{
-					if( i != 0 )
+					if( actors->mActorType[i] != EActorType::Player )
 					{ 
 						if( XMVectorGetX( XMVector3LengthSq( playerLocation - XMLoadFloat3( &transformComp->location ) ) ) <=
 							SteeringBehaviourConstants::THREAT_DISTANCE_SQUARED )
 						{
 							steerComp->state = ESteeringBehaviourState::Flee;
 							XMStoreFloat3( &moveComp->targetLocation, playerLocation );
+
 						}
 
 					}

@@ -65,6 +65,7 @@ bool Engine::InitializeActors()
 
 		mActors->mIsActive.reserve( GameGlobals::MAX_ACTORS );
 		mActors->mComponentMasks.reserve( GameGlobals::MAX_ACTORS );
+		mActors->mActorType.reserve( GameGlobals::MAX_ACTORS );
 		mActors->mTransformComponents.reserve( GameGlobals::MAX_ACTORS );
 		mActors->mMeshComponents.reserve( GameGlobals::MAX_ACTORS );
 		mActors->mHealthComponents.reserve( GameGlobals::MAX_ACTORS );
@@ -75,6 +76,7 @@ bool Engine::InitializeActors()
 		{
 			mActors->mIsActive.push_back( false );
 			mActors->mComponentMasks.push_back( 0 );
+			mActors->mActorType.push_back( EActorType::None );
 			mActors->mTransformComponents.push_back( std::make_unique<TransformComponent>() );
 			mActors->mMeshComponents.push_back( std::make_unique<MeshComponent>() );
 			mActors->mHealthComponents.push_back( std::make_unique<HealthComponent>() );
@@ -85,6 +87,7 @@ bool Engine::InitializeActors()
 	}
 	catch( const std::exception& )
 	{
+		OutputDebugStringA( "Error: Failed to initialize actors!" );
 		return false;
 	}
 
@@ -100,8 +103,12 @@ void Engine::CheckInactiveActors()
 		{
 			std::swap( mActors->mIsActive[i], mActors->mIsActive[mNumActiveActors] );
 			std::swap( mActors->mComponentMasks[i], mActors->mComponentMasks[mNumActiveActors] );
+			std::swap( mActors->mActorType[i], mActors->mActorType[mNumActiveActors] );
 			mActors->mTransformComponents[i].swap( mActors->mTransformComponents[mNumActiveActors] );
+			mActors->mMeshComponents[i].swap( mActors->mMeshComponents[mNumActiveActors] );
+			mActors->mHealthComponents[i].swap( mActors->mHealthComponents[mNumActiveActors] );
 			mActors->mMovementComponents[i].swap( mActors->mMovementComponents[mNumActiveActors] );
+			mActors->mSteeringBehaviorComponents[i].swap( mActors->mSteeringBehaviorComponents[mNumActiveActors] );
 			mNumActiveActors--;
 
 		}
@@ -144,9 +151,10 @@ Engine::Engine()
 	mActors				= nullptr;
 	mNumActiveActors	= 0;
 
-	mGraphicSystem	= nullptr;
-	mCameraSystem	= nullptr;
-	mMovementSystem = nullptr;
+	mGraphicSystem				= nullptr;
+	mCameraSystem				= nullptr;
+	mMovementSystem				= nullptr;
+	mSteeringBehaviourSystem	= nullptr;
 }
 
 Engine::~Engine()
@@ -249,6 +257,7 @@ const bool Engine::RequestActor( std::vector<std::unique_ptr<IComponent>>& compo
 	{
 		const size_t& i			= mNumActiveActors;
 		mActors->mIsActive[i]	= true;
+		mActors->mActorType[i] = ( i == 0 ) ? EActorType::Player : EActorType::Enemy;
 
 		// Set Components
 		for( auto& component : componentList )
