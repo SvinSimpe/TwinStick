@@ -122,7 +122,9 @@
     <ClInclude Include="ActorCollection.h" />
     <ClInclude Include="CameraSystem.h" />
     <ClInclude Include="CBufferTypes.h" />
+    <ClInclude Include="CircleCollisionShape.h" />
     <ClInclude Include="CollisionComponent.h" />
+    <ClInclude Include="CollisionShape.h" />
     <ClInclude Include="CubeMesh.h" />
     <ClInclude Include="EActorType.h" />
     <ClInclude Include="EBufferType.h" />

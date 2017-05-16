@@ -131,6 +131,12 @@
     <ClInclude Include="CollisionComponent.h">
       <Filter>Header Files\Components\Collision</Filter>
     </ClInclude>
+    <ClInclude Include="CircleCollisionShape.h">
+      <Filter>Header Files\Components\Collision</Filter>
+    </ClInclude>
+    <ClInclude Include="CollisionShape.h">
+      <Filter>Header Files\Components\Collision</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="Shader.hlsl">
