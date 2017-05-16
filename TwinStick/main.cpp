@@ -1,6 +1,7 @@
-#include "Engine.h"
+﻿#include "Engine.h"
 #include <memory>
 #include <ctime>
+#include <float.h>
 
 int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow )
 {
@@ -92,7 +93,6 @@ int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdL
 	
 		engine->RequestActor( componentList );
 	}
-		
 	
 
 	return engine->Run();

@@ -122,6 +122,12 @@
     <ClInclude Include="ESteeringBehaviourState.h">
       <Filter>Header Files\Enums</Filter>
     </ClInclude>
+    <ClInclude Include="CollisionComponent.h">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="ECollisionShape.h">
+      <Filter>Header Files\Enums</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="Shader.hlsl">

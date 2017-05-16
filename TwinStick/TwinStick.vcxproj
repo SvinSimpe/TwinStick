@@ -122,9 +122,11 @@
     <ClInclude Include="ActorCollection.h" />
     <ClInclude Include="CameraSystem.h" />
     <ClInclude Include="CBufferTypes.h" />
+    <ClInclude Include="CollisionComponent.h" />
     <ClInclude Include="CubeMesh.h" />
     <ClInclude Include="EActorType.h" />
     <ClInclude Include="EBufferType.h" />
+    <ClInclude Include="ECollisionShape.h" />
     <ClInclude Include="EComponentType.h" />
     <ClInclude Include="EMeshType.h" />
     <ClInclude Include="Engine.h" />
