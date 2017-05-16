@@ -120,6 +120,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ActorCollection.h" />
+    <ClInclude Include="BoxCollisionShape.h" />
     <ClInclude Include="CameraSystem.h" />
     <ClInclude Include="CBufferTypes.h" />
     <ClInclude Include="CircleCollisionShape.h" />

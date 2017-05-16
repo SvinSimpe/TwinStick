@@ -137,6 +137,9 @@
     <ClInclude Include="CollisionShape.h">
       <Filter>Header Files\Components\Collision</Filter>
     </ClInclude>
+    <ClInclude Include="BoxCollisionShape.h">
+      <Filter>Header Files\Components\Collision</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="Shader.hlsl">
