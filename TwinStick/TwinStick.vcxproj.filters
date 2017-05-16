@@ -34,6 +34,9 @@
     <Filter Include="Header Files\Misc">
       <UniqueIdentifier>{d5dad977-b029-47ad-9f29-7ccde3c4f1f6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Components\Collision">
+      <UniqueIdentifier>{7dbd2f29-a3eb-42e9-b60e-7d8db4965438}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -122,11 +125,11 @@
     <ClInclude Include="ESteeringBehaviourState.h">
       <Filter>Header Files\Enums</Filter>
     </ClInclude>
-    <ClInclude Include="CollisionComponent.h">
-      <Filter>Header Files\Components</Filter>
-    </ClInclude>
     <ClInclude Include="ECollisionShape.h">
       <Filter>Header Files\Enums</Filter>
+    </ClInclude>
+    <ClInclude Include="CollisionComponent.h">
+      <Filter>Header Files\Components\Collision</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

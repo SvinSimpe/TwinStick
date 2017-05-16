@@ -37,5 +37,13 @@ struct CollisionComponent : public IComponent
 
 	}
 
+	virtual DirectX::XMFLOAT2 GetPosition() const = 0;
+
+	virtual DirectX::XMFLOAT2 GetCenter() const = 0;
+
+	virtual float GetHalfExtent() const = 0;
+
+	virtual float GetHalfExtentSq() const = 0;
+
 	virtual const ECollisionShape GetCollisionShape() const = 0;
 };
