@@ -2,6 +2,46 @@
 
 #include "ECollisionShape.h"
 #include <DirectXMath.h>
+using namespace DirectX;
+
+namespace Intersection
+{
+	inline bool AABBVsAABB( const BoxCollisionShape& box1, 
+							const BoxCollisionShape& box2 ) noexcept
+	{
+
+		return ( box1.mPosition.x < box2.mPosition.x + box2.mWidth &&
+				 box1.mPosition.x + box1.mWidth > box2.mPosition.x &&
+				 box1.mPosition.y < box2.mPosition.y - box2.mHeight &&
+				 box1.mPosition.y - box1.mHeight > box2.mPosition.y );
+
+	}
+
+
+
+	inline bool CircleVsCircle( const CircleCollisionShape& circle1, 
+								const CircleCollisionShape& circle2 ) noexcept
+	{
+		return ( XMVectorGetX( XMVector2LengthSq( XMLoadFloat2( &circle1.mCenter ) - 
+												  XMLoadFloat2( &circle2.mCenter ) ) ) <
+				 circle1.GetHalfExtentSq() + circle2.GetHalfExtentSq() );
+	}
+
+	inline bool CircleVsAABB( const CircleCollisionShape& circle, 
+							  const BoxCollisionShape& box ) noexcept
+	{
+		XMVECTOR centerToCenter = XMVector2Length( XMLoadFloat2( &circle.mCenter ) -
+												   XMLoadFloat2( &box.mCenter ) );
+		XMVECTOR boxHalfExtents = XMVectorSet( static_cast<int>( box.mWidth ) / 2,
+											   static_cast<int>( box.mHeight ) / 2,
+											   0.0f, 0.0f );
+		XMVECTOR closestPoint = XMVectorClamp( centerToCenter, -boxHalfExtents, boxHalfExtents );
+
+		return circle.GetHalfExtent() < XMVectorGetX( closestPoint - XMLoadFloat2( &circle.mCenter ) );
+
+	}
+
+}
 
 struct CollisionShape
 {

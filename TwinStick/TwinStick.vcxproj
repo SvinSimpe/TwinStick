@@ -135,7 +135,6 @@
     <ClInclude Include="GraphicSystem.h" />
     <ClInclude Include="HealthComponent.h" />
     <ClInclude Include="IComponent.h" />
-    <ClInclude Include="Intersection.h" />
     <ClInclude Include="ISystems.h" />
     <ClInclude Include="MeshComponent.h" />
     <ClInclude Include="MovementComponent.h" />
