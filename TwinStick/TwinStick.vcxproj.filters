@@ -131,14 +131,11 @@
     <ClInclude Include="CollisionComponent.h">
       <Filter>Header Files\Components\Collision</Filter>
     </ClInclude>
-    <ClInclude Include="CircleCollisionShape.h">
-      <Filter>Header Files\Components\Collision</Filter>
-    </ClInclude>
     <ClInclude Include="CollisionShape.h">
       <Filter>Header Files\Components\Collision</Filter>
     </ClInclude>
-    <ClInclude Include="BoxCollisionShape.h">
-      <Filter>Header Files\Components\Collision</Filter>
+    <ClInclude Include="Intersection.h">
+      <Filter>Header Files\Misc</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

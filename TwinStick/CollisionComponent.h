@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "IComponent.h"
-#include "CircleCollisionShape.h"	
+#include "CollisionShape.h"	
 
 struct CollisionComponent : public IComponent
 {
