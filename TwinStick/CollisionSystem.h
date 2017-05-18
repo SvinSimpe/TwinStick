@@ -8,6 +8,11 @@ class CollisionSystem : public ISystems
 	private:
 		QuadTree mQuadTree;
 
+	private:
+		void UpdateCollisionComponents( std::unique_ptr<TransformComponent>& transform,
+										std::unique_ptr<CollisionComponent>& collision );
+		void CheckCollision();
+
 	public:
 		CollisionSystem();
 		~CollisionSystem();

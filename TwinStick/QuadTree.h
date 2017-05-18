@@ -5,7 +5,7 @@
 #include <DirectXMath.h>
 #include "CollisionComponent.h"
 
-#define COLLISION_MASK ( EComponentType::Transform | EComponentType::Collision )
+
 
 class QuadTree
 {
@@ -14,9 +14,9 @@ class QuadTree
 		static const unsigned int MAX_LEVEL				= 8;
 
 		BoxCollisionShape						mBounds;
-		unsigned int							mLevel;
+		size_t									mLevel;
 		std::vector<std::unique_ptr<QuadTree>>	mChildren;	
-		std::list<CollisionShape*>				mNodeList;
+		std::list<CollisionComponent*>			mNodeList;
 
 		bool	mIsLeaf;
 
@@ -24,7 +24,6 @@ class QuadTree
 		void Split();
 		
 		bool Overlap( const CollisionShape& shape ) const;
-		bool Overlap( const std::unique_ptr<CollisionComponent>& comp ) const;
 
 	public:
 		QuadTree();
@@ -35,12 +34,17 @@ class QuadTree
 		
 		void Clear();
 
-		void Insert( CollisionShape& comp );
+		void Insert( CollisionComponent& comp );
 		
 		void GetDebugVertices( std::vector<XMFLOAT2>& vertices ) const;
 
 
-		void GetOverlaps( std::vector<CollisionShape*>& overlaps,
-						  const CollisionShape& shape ) const;
+		void GetOverlaps( std::vector<CollisionComponent*>& overlaps,
+						  const CollisionComponent& shape ) const;
+
+		inline const std::list<CollisionComponent*>& GetNodeList() const // redundant?
+		{
+			return mNodeList; 
+		}
 
 };

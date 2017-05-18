@@ -6,6 +6,7 @@
 struct CollisionComponent : public IComponent
 {
 	CollisionShape* mCollisionShape;
+	bool			mOverlap;
 
 	// Inherited via IComponent
 	virtual const EComponentType GetType() const override
@@ -20,11 +21,11 @@ struct CollisionComponent : public IComponent
 		{
 			CollisionComponent& newCollision = dynamic_cast<CollisionComponent&>( *newData );
 			mCollisionShape = newCollision.mCollisionShape;
+			mOverlap		= newCollision.mOverlap;
 
 		}
 		catch( const std::exception& exc )
 		{
-
 			#if _DEBUG
 			OutputDebugStringA( "Error: " );
 			OutputDebugStringA( exc.what() );

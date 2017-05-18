@@ -19,6 +19,8 @@ struct CircleCollisionShape : public CollisionShape
 	float	mRadius;
 	float	mRadiusSq;
 
+	CircleCollisionShape(){}
+
 	CircleCollisionShape( DirectX::XMFLOAT2 center, float radius )
 	{
 		mCenter		= center;
@@ -105,8 +107,7 @@ namespace Intersection
 	{
 		XMVECTOR centerToCenter = XMVector2Length( XMLoadFloat2( &circle.mCenter ) -
 												   XMLoadFloat2( &box.mCenter ) );
-		XMVECTOR boxHalfExtents = XMVectorSet( static_cast<int>( box.mWidth ) / 2,
-											   static_cast<int>( box.mHeight ) / 2,
+		XMVECTOR boxHalfExtents = XMVectorSet( box.mWidth * 0.5f, box.mHeight * 0.5f,
 											   0.0f, 0.0f );
 		XMVECTOR closestPoint = XMVectorClamp( centerToCenter, -boxHalfExtents, boxHalfExtents );
 

@@ -71,6 +71,8 @@ bool Engine::InitializeActors()
 		mActors->mHealthComponents.reserve( GameGlobals::MAX_ACTORS );
 		mActors->mMovementComponents.reserve( GameGlobals::MAX_ACTORS );
 		mActors->mSteeringBehaviorComponents.reserve( GameGlobals::MAX_ACTORS );
+		mActors->mCollisionComponents.reserve( GameGlobals::MAX_ACTORS );
+
 
 		for( size_t i = 0; i < GameGlobals::MAX_ACTORS; i++ )
 		{
@@ -82,6 +84,7 @@ bool Engine::InitializeActors()
 			mActors->mHealthComponents.push_back( std::make_unique<HealthComponent>() );
 			mActors->mMovementComponents.push_back( std::make_unique<MovementComponent>() );
 			mActors->mSteeringBehaviorComponents.push_back( std::make_unique<SteeringBehaviourComponent>() );
+			mActors->mCollisionComponents.push_back( std::make_unique<CollisionComponent>() );
 
 		}
 	}
@@ -109,6 +112,7 @@ void Engine::CheckInactiveActors()
 			mActors->mHealthComponents[i].swap( mActors->mHealthComponents[mNumActiveActors] );
 			mActors->mMovementComponents[i].swap( mActors->mMovementComponents[mNumActiveActors] );
 			mActors->mSteeringBehaviorComponents[i].swap( mActors->mSteeringBehaviorComponents[mNumActiveActors] );
+			mActors->mCollisionComponents[i].swap( mActors->mCollisionComponents[mNumActiveActors] );
 			mNumActiveActors--;
 
 		}
