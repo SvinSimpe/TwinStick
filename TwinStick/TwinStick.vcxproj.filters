@@ -57,6 +57,9 @@
     <ClCompile Include="SteeringBehaviourSystem.cpp">
       <Filter>Source Files\Systems</Filter>
     </ClCompile>
+    <ClCompile Include="QuadTree.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine.h">
@@ -133,6 +136,9 @@
     </ClInclude>
     <ClInclude Include="CollisionShape.h">
       <Filter>Header Files\Components\Collision</Filter>
+    </ClInclude>
+    <ClInclude Include="QuadTree.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
