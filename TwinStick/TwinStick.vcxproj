@@ -112,6 +112,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="CameraSystem.cpp" />
+    <ClCompile Include="CollisionSystem.cpp" />
     <ClCompile Include="Engine.cpp" />
     <ClCompile Include="GraphicSystem.cpp" />
     <ClCompile Include="main.cpp" />
@@ -125,6 +126,7 @@
     <ClInclude Include="CBufferTypes.h" />
     <ClInclude Include="CollisionComponent.h" />
     <ClInclude Include="CollisionShape.h" />
+    <ClInclude Include="CollisionSystem.h" />
     <ClInclude Include="CubeMesh.h" />
     <ClInclude Include="EActorType.h" />
     <ClInclude Include="EBufferType.h" />

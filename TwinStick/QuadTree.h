@@ -5,6 +5,8 @@
 #include <DirectXMath.h>
 #include "CollisionComponent.h"
 
+#define COLLISION_MASK ( EComponentType::Transform | EComponentType::Collision )
+
 class QuadTree
 {
 	private:
