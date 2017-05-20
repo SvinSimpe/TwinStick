@@ -5,8 +5,8 @@
 
 struct CollisionComponent : public IComponent
 {
-	CollisionShape* mCollisionShape;
-	bool			mOverlap;
+	std::unique_ptr<CollisionShape> mCollisionShape;
+	bool							mOverlap;
 
 	// Inherited via IComponent
 	virtual const EComponentType GetType() const override
@@ -20,7 +20,7 @@ struct CollisionComponent : public IComponent
 		try
 		{
 			CollisionComponent& newCollision = dynamic_cast<CollisionComponent&>( *newData );
-			mCollisionShape = newCollision.mCollisionShape;
+			mCollisionShape = std::move( newCollision.mCollisionShape);
 			mOverlap		= newCollision.mOverlap;
 
 		}

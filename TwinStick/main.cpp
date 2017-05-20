@@ -13,7 +13,7 @@ int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdL
 		return 0;
 
 
-	for( size_t i = 0; i < 250; i++ )
+	for( size_t i = 0; i < 200; i++ )
 	{
 		std::vector<std::unique_ptr<IComponent>> componentList;
 		std::unique_ptr<TransformComponent> transform = std::make_unique<TransformComponent>();
@@ -21,6 +21,9 @@ int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdL
 		std::unique_ptr<HealthComponent> health = std::make_unique<HealthComponent>( 50.0f, 150.0f );
 		std::unique_ptr<MovementComponent> movement = std::make_unique<MovementComponent>();
 		std::unique_ptr<SteeringBehaviourComponent> steeringBehaviour = std::make_unique<SteeringBehaviourComponent>();
+		std::unique_ptr<CollisionComponent> collision = std::make_unique<CollisionComponent>();
+
+		collision->mCollisionShape = std::make_unique<CircleCollisionShape>( XMFLOAT2(), 5.0f );
 
 		movement->velocity = XMFLOAT3( 0.0f, 0.0f, 1.0f );
 		
@@ -29,6 +32,12 @@ int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdL
 											 0.0f,
 											 RandomFloatInRange( GameGlobals::WorldBounds::Z_MIN,
 																 GameGlobals::WorldBounds::Z_MAX ) );
+
+		transform->location = XMFLOAT3( RandomFloatInRange( GameGlobals::WorldBounds::X_MIN,
+															GameGlobals::WorldBounds::X_MAX ),
+										0.0f,
+										RandomFloatInRange( GameGlobals::WorldBounds::Z_MIN,
+															GameGlobals::WorldBounds::Z_MAX ) );
 		
 		switch( i % 5 )
 		{
@@ -85,12 +94,15 @@ int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdL
 		steeringBehaviour->state = ESteeringBehaviourState::Wander;
 
 
+		// TEMP
+		mesh->color = XMFLOAT4( 1.0f, 1.0f, 1.0f, 1.0f );
+
 		componentList.push_back( std::move( transform ) );
 		componentList.push_back( std::move( mesh ) );
 		componentList.push_back( std::move( health ) );
 		componentList.push_back( std::move( movement ) );
 		componentList.push_back( std::move( steeringBehaviour ) );
-	
+		componentList.push_back( std::move( collision ) );
 		engine->RequestActor( componentList );
 	}
 	

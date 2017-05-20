@@ -1,11 +1,11 @@
-#pragma once
+﻿#pragma once
 
 #include <DirectXMath.h>
 #include <ctime>
 
 namespace GameGlobals
 {
-	constexpr size_t MAX_ACTORS = 2048;
+	constexpr size_t MAX_ACTORS = 512;
 
 	namespace WorldBounds
 	{

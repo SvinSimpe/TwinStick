@@ -24,6 +24,7 @@ struct CircleCollisionShape : public CollisionShape
 	CircleCollisionShape( DirectX::XMFLOAT2 center, float radius )
 	{
 		mCenter		= center;
+		mPosition	= mCenter;
 		mRadius		= radius;
 		mRadiusSq	= mRadius * mRadius;
 	};

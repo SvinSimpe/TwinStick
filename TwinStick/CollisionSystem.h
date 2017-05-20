@@ -6,12 +6,13 @@
 class CollisionSystem : public ISystems
 {
 	private:
-		QuadTree mQuadTree;
+		std::unique_ptr<QuadTree> mQuadTree;
+		size_t	mNumChecks;
 
 	private:
 		void UpdateCollisionComponents( std::unique_ptr<TransformComponent>& transform,
 										std::unique_ptr<CollisionComponent>& collision );
-		void CheckCollision();
+		void CheckCollision( std::unique_ptr<ActorCollection>& actors, size_t numActiveActors );
 
 	public:
 		CollisionSystem();

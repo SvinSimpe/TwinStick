@@ -1,4 +1,5 @@
 ﻿#include "QuadTree.h"
+//#include <algorithm>
 using namespace DirectX;
 
 void QuadTree::Split()
@@ -8,11 +9,12 @@ void QuadTree::Split()
 	float subWidth	= mBounds.mWidth * 0.5f;
 	float subHeight	= mBounds.mHeight * 0.5f;
 
-	mChildren[0] = std::make_unique<QuadTree>( mLevel + 1, BoxCollisionShape( XMFLOAT2( x, y ), subWidth, subHeight ) );
-	mChildren[1] = std::make_unique<QuadTree>( mLevel + 1, BoxCollisionShape( XMFLOAT2( x + subWidth, y ), subWidth, subHeight ) );
-	mChildren[2] = std::make_unique<QuadTree>( mLevel + 1, BoxCollisionShape( XMFLOAT2( x, y - subHeight ), subWidth, subHeight ) );
-	mChildren[3] = std::make_unique<QuadTree>( mLevel + 1, BoxCollisionShape( XMFLOAT2( x + subWidth, y - subHeight ), subWidth, subHeight ) );
+	mChildren.push_back( std::make_unique<QuadTree>( mLevel + 1, BoxCollisionShape( XMFLOAT2( x, y ), subWidth, subHeight ) ) );
+	mChildren.push_back( std::make_unique<QuadTree>( mLevel + 1, BoxCollisionShape( XMFLOAT2( x + subWidth, y ), subWidth, subHeight ) ) );
+	mChildren.push_back( std::make_unique<QuadTree>( mLevel + 1, BoxCollisionShape( XMFLOAT2( x, y - subHeight ), subWidth, subHeight ) ) );
+	mChildren.push_back( std::make_unique<QuadTree>( mLevel + 1, BoxCollisionShape( XMFLOAT2( x + subWidth, y - subHeight ), subWidth, subHeight ) ) );
 
+	mChildren.reserve( 4 );
 	mIsLeaf = false;
 }
 
@@ -38,27 +40,6 @@ bool QuadTree::Overlap( const CollisionShape& shape ) const
 
 	return overlap;
 }
-
-//bool QuadTree::Overlap( const std::unique_ptr<CollisionComponent>& comp ) const
-//{
-//	bool overlap = false;
-//
-//	if( comp->mCollisionShape->GetCollisionShape() == ECollisionShape::Box )
-//	{
-//		BoxCollisionShape& compBox = BoxCollisionShape( comp->mCollisionShape->mPosition,
-//														comp->mCollisionShape->GetHalfExtent(), comp->mCollisionShape->GetHalfExtent() );
-//		overlap = Intersection::AABBVsAABB( compBox, mBounds );
-//
-//	}
-//	else if( comp->mCollisionShape->GetCollisionShape() == ECollisionShape::Circle )
-//	{
-//		CircleCollisionShape& compCircle = CircleCollisionShape( comp->mCollisionShape->mPosition, comp->mCollisionShape->GetHalfExtent() );
-//		overlap = Intersection::CircleVsAABB( compCircle, mBounds );
-//
-//	}
-//
-//	return overlap;
-//}
 
 QuadTree::QuadTree()
 {
@@ -91,11 +72,16 @@ void QuadTree::Clear()
 
 		}
 	}
+
+	mChildren.clear();
+
+	if( mLevel == 1 )
+		mIsLeaf = true;
 }
 
 void QuadTree::Insert( CollisionComponent& comp )
 {
-	if( !mIsLeaf )
+	if( mIsLeaf )
 		mNodeList.push_back( &comp );
 
 	else
@@ -115,12 +101,12 @@ void QuadTree::Insert( CollisionComponent& comp )
 		{
 			for( auto& child : mChildren )
 			{
-				if( child->Overlap( *mNodeList.front()->mCollisionShape ) )
-					child->Insert( *mNodeList.front() );
+				if( child->Overlap( *mNodeList.back()->mCollisionShape ) )
+					child->Insert( *mNodeList.back() );
 
 			}
 
-			mNodeList.pop_front();
+			mNodeList.pop_back();
 		}
 	}
 }
@@ -146,16 +132,27 @@ void QuadTree::GetDebugVertices( std::vector<XMFLOAT2>& vertices ) const
 	}
 }
 
+
+// GetPossibleOverlaps
+/*
+Returns all the possible overlaps given a component. The component
+can reside within multiple quads.
+*/
 void QuadTree::GetOverlaps( std::vector<CollisionComponent*>& overlaps,
 							const CollisionComponent& comp ) const
 {
 	if( mIsLeaf )
 	{
-		for( auto& node : mNodeList )
-		{
-			if( node != &comp )
-				overlaps.push_back( node );
-
+		if( std::find( mNodeList.begin(), mNodeList.end(), &comp ) != mNodeList.end() )
+		{ 
+			for( auto& node : mNodeList )
+			{
+				if( node != &comp )
+				{
+					if( std::find( overlaps.begin(), overlaps.end(), node ) == overlaps.end() )
+						overlaps.push_back( node );
+				}
+			}
 		}
 	}
 	else

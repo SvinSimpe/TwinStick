@@ -148,6 +148,9 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <Text Include="Test.hlsl">
+      <Filter>Shaders</Filter>
+    </Text>
     <Text Include="Shader.hlsl">
       <Filter>Shaders</Filter>
     </Text>

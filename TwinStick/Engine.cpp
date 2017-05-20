@@ -21,6 +21,9 @@ bool Engine::Update( float deltaTime )
 	if( !mMovementSystem->Update( deltaTime, mActors, mNumActiveActors, nullptr ) )
 		return false;
 
+	if( !mCollisionSystem->Update( deltaTime, mActors, mNumActiveActors, nullptr ) )
+		return false;
+
 	if( !mCameraSystem->Update( deltaTime, mActors, mNumActiveActors, nullptr ) )
 		return false;
 
@@ -51,6 +54,10 @@ bool Engine::InitializeSystems()
 
 	mSteeringBehaviourSystem = std::make_unique<SteeringBehaviourSystem>();
 	if( !mSteeringBehaviourSystem )
+		return false;
+
+	mCollisionSystem = std::make_unique<CollisionSystem>();
+	if( !mCollisionSystem )
 		return false;
 
 	return true;
@@ -159,6 +166,7 @@ Engine::Engine()
 	mCameraSystem				= nullptr;
 	mMovementSystem				= nullptr;
 	mSteeringBehaviourSystem	= nullptr;
+	mCollisionSystem			= nullptr;
 }
 
 Engine::~Engine()
@@ -243,6 +251,9 @@ int Engine::Run()
 			QueryPerformanceCounter( (LARGE_INTEGER*)&currTimeStamp );
 			float deltaTime = ( currTimeStamp - prevTimeStamp ) * secsPerCnt;
 
+			//if( deltaTime > 0.016f )
+			//	deltaTime = 0.016f;
+
 			// Update Engine modules
 			if( !Update( deltaTime ) ) 
 				return -1;
@@ -325,6 +336,18 @@ const bool Engine::RequestActor( std::vector<std::unique_ptr<IComponent>>& compo
 					}
 					else
 						OutputDebugString( "Error: Unable to set SteeringBehaviourComponent data" );
+
+					break;
+				}
+				case EComponentType::Collision :
+				{
+					if( mActors->mCollisionComponents[mNumActiveActors]->Set( component ) )
+					{
+						mActors->mComponentMasks[i] = static_cast<size_t>( 
+							mActors->mComponentMasks[i] | EComponentType::Collision );
+					}
+					else
+						OutputDebugString( "Error: Unable to set CollisionComponent data" );
 
 					break;
 				}

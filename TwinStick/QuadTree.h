@@ -4,19 +4,20 @@
 #include <vector>
 #include <DirectXMath.h>
 #include "CollisionComponent.h"
+#include <set>
 
 
 
 class QuadTree
 {
 	private:
-		static const unsigned int MAX_NODES_PER_QUAD	= 64;
-		static const unsigned int MAX_LEVEL				= 8;
+		static const unsigned int MAX_NODES_PER_QUAD	= 40;
+		static const unsigned int MAX_LEVEL				= 3;
 
 		BoxCollisionShape						mBounds;
 		size_t									mLevel;
 		std::vector<std::unique_ptr<QuadTree>>	mChildren;	
-		std::list<CollisionComponent*>			mNodeList;
+		std::vector<CollisionComponent*>			mNodeList;
 
 		bool	mIsLeaf;
 
@@ -42,7 +43,7 @@ class QuadTree
 		void GetOverlaps( std::vector<CollisionComponent*>& overlaps,
 						  const CollisionComponent& shape ) const;
 
-		inline const std::list<CollisionComponent*>& GetNodeList() const // redundant?
+		inline const std::vector<CollisionComponent*>& GetNodeList() const // redundant?
 		{
 			return mNodeList; 
 		}

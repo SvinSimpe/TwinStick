@@ -1,6 +1,7 @@
 ﻿#include "MovementSystem.h"
 #include "Utility.h"
 #include "stdafx.h"
+#include <string>
 
 using namespace DirectX;
 
@@ -30,6 +31,15 @@ bool MovementSystem::Update( float deltaTime, std::unique_ptr<ActorCollection>& 
 						   XMLoadFloat3( &transformComp->location ) + XMLoadFloat3( &moveComp->velocity ) * moveComp->speed * deltaTime );
 
 			transformComp->rotation.y = atan2f( moveComp->velocity.x, moveComp->velocity.z );
+
+			if( actors->mCollisionComponents[i]->mOverlap )
+			{ 
+				actors->mMeshComponents[i]->color = XMFLOAT4( 0.0f, 1.0f, 0.0f, 1.0f );
+			}
+			else
+				actors->mMeshComponents[i]->color = XMFLOAT4( 1.0f, 1.0f, 1.0f, 1.0f );
+
+			actors->mCollisionComponents[i]->mOverlap = false;
 
 		}
 	}
