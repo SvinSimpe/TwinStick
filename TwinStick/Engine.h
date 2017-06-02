@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <Windows.h>
 
@@ -11,6 +11,7 @@
 #include "CameraSystem.h"
 #include "MovementSystem.h"
 #include "SteeringBehaviourSystem.h"
+#include "CollisionSystem.h"
 
 
 class Engine
@@ -27,7 +28,7 @@ class Engine
 		std::unique_ptr<CameraSystem>				mCameraSystem;
 		std::unique_ptr<MovementSystem>				mMovementSystem;
 		std::unique_ptr<SteeringBehaviourSystem>	mSteeringBehaviourSystem;
-
+		std::unique_ptr<CollisionSystem>			mCollisionSystem;
 
 	private:
 		bool Update( float deltaTime );

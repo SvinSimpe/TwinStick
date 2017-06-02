@@ -21,8 +21,15 @@ bool Engine::Update( float deltaTime )
 	if( !mMovementSystem->Update( deltaTime, mActors, mNumActiveActors, nullptr ) )
 		return false;
 
+	if( !mCollisionSystem->Update( deltaTime, mActors, mNumActiveActors, nullptr ) )
+		return false;
+
 	if( !mCameraSystem->Update( deltaTime, mActors, mNumActiveActors, nullptr ) )
 		return false;
+
+	std::vector<XMFLOAT2> quadTreeVertices;
+	mCollisionSystem->GetQuadTreeVertices( quadTreeVertices );
+	mGraphicSystem->SetQuadTreeVertices( quadTreeVertices );
 
 	FrameData newFrameData = { mCameraSystem->GetViewMatrixTranspose(),
 		mCameraSystem->GetProjectionMatrixTranspose(),
@@ -37,7 +44,7 @@ bool Engine::Update( float deltaTime )
 
 bool Engine::InitializeSystems()
 {
-	mCameraSystem = std::make_unique<CameraSystem>( XMFLOAT3( 0.0f, 200.0f, -450.0f ) );
+	mCameraSystem = std::make_unique<CameraSystem>( XMFLOAT3( 0.0f, 1550.0f, -1450.0f ) ); //-1650Z
 	if( !mCameraSystem )
 		return false;
 
@@ -51,6 +58,10 @@ bool Engine::InitializeSystems()
 
 	mSteeringBehaviourSystem = std::make_unique<SteeringBehaviourSystem>();
 	if( !mSteeringBehaviourSystem )
+		return false;
+
+	mCollisionSystem = std::make_unique<CollisionSystem>();
+	if( !mCollisionSystem )
 		return false;
 
 	return true;
@@ -71,6 +82,8 @@ bool Engine::InitializeActors()
 		mActors->mHealthComponents.reserve( GameGlobals::MAX_ACTORS );
 		mActors->mMovementComponents.reserve( GameGlobals::MAX_ACTORS );
 		mActors->mSteeringBehaviorComponents.reserve( GameGlobals::MAX_ACTORS );
+		mActors->mCollisionComponents.reserve( GameGlobals::MAX_ACTORS );
+
 
 		for( size_t i = 0; i < GameGlobals::MAX_ACTORS; i++ )
 		{
@@ -82,6 +95,7 @@ bool Engine::InitializeActors()
 			mActors->mHealthComponents.push_back( std::make_unique<HealthComponent>() );
 			mActors->mMovementComponents.push_back( std::make_unique<MovementComponent>() );
 			mActors->mSteeringBehaviorComponents.push_back( std::make_unique<SteeringBehaviourComponent>() );
+			mActors->mCollisionComponents.push_back( std::make_unique<CollisionComponent>() );
 
 		}
 	}
@@ -109,6 +123,7 @@ void Engine::CheckInactiveActors()
 			mActors->mHealthComponents[i].swap( mActors->mHealthComponents[mNumActiveActors] );
 			mActors->mMovementComponents[i].swap( mActors->mMovementComponents[mNumActiveActors] );
 			mActors->mSteeringBehaviorComponents[i].swap( mActors->mSteeringBehaviorComponents[mNumActiveActors] );
+			mActors->mCollisionComponents[i].swap( mActors->mCollisionComponents[mNumActiveActors] );
 			mNumActiveActors--;
 
 		}
@@ -155,6 +170,7 @@ Engine::Engine()
 	mCameraSystem				= nullptr;
 	mMovementSystem				= nullptr;
 	mSteeringBehaviourSystem	= nullptr;
+	mCollisionSystem			= nullptr;
 }
 
 Engine::~Engine()
@@ -239,6 +255,9 @@ int Engine::Run()
 			QueryPerformanceCounter( (LARGE_INTEGER*)&currTimeStamp );
 			float deltaTime = ( currTimeStamp - prevTimeStamp ) * secsPerCnt;
 
+			//if( deltaTime > 0.016f )
+			//	deltaTime = 0.016f;
+
 			// Update Engine modules
 			if( !Update( deltaTime ) ) 
 				return -1;
@@ -321,6 +340,18 @@ const bool Engine::RequestActor( std::vector<std::unique_ptr<IComponent>>& compo
 					}
 					else
 						OutputDebugString( "Error: Unable to set SteeringBehaviourComponent data" );
+
+					break;
+				}
+				case EComponentType::Collision :
+				{
+					if( mActors->mCollisionComponents[mNumActiveActors]->Set( component ) )
+					{
+						mActors->mComponentMasks[i] = static_cast<size_t>( 
+							mActors->mComponentMasks[i] | EComponentType::Collision );
+					}
+					else
+						OutputDebugString( "Error: Unable to set CollisionComponent data" );
 
 					break;
 				}

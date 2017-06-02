@@ -9,7 +9,8 @@ enum class EComponentType : std::uint32_t
 	Movement			= 1 << 1,
 	Mesh				= 1 << 2,
 	SteeringBehaviour	= 1 << 3,
-	Health				= 1 << 4
+	Collision			= 1 << 4,
+	Health				= 1 << 5
 
 };
 

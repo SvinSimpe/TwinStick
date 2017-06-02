@@ -7,8 +7,8 @@ using namespace DirectX;
 
 namespace SteeringBehaviourConstants
 {
-	constexpr float MIN_WANDER_TIME					= 0.5f;
-	constexpr float MAX_WANDER_TIME					= 3.0f;
+	constexpr float MIN_WANDER_TIME					= 5.5f;
+	constexpr float MAX_WANDER_TIME					= 6.0f;
 	constexpr float THREAT_DISTANCE_SQUARED			= 100.0f * 100.0f;
 	constexpr float PREFERED_SAFE_DISTANCE_SQUARED	= 120.0f * 120.0f;
 	constexpr float ARRIVAL_RADIUS_SQUARED			= 35.0f * 35.0f;
@@ -76,7 +76,9 @@ bool SteeringBehaviourSystem::Update( float deltaTime, std::unique_ptr<ActorColl
 				{
 					if( actors->mActorType[i] != EActorType::Player )
 					{ 
-						if( XMVectorGetX( XMVector3LengthSq( playerLocation - XMLoadFloat3( &transformComp->location ) ) ) <=
+						float d = XMVectorGetX( XMVector3LengthSq( playerLocation - XMLoadFloat3( &transformComp->location ) ) );
+
+						if( d <=
 							SteeringBehaviourConstants::THREAT_DISTANCE_SQUARED )
 						{
 							steerComp->state = ESteeringBehaviourState::Flee;
@@ -115,6 +117,8 @@ bool SteeringBehaviourSystem::Update( float deltaTime, std::unique_ptr<ActorColl
 						steerComp->state = ESteeringBehaviourState::Wander;
 
 					}
+
+					XMStoreFloat3( &moveComp->targetLocation, playerLocation );
 					
 					CalculateActorSteeringAndVelocity( transformComp, moveComp, steerComp, -1.0f );
 					break;

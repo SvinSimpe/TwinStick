@@ -83,6 +83,9 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
     </ClCompile>
+    <FxCompile>
+      <ShaderModel>5.0</ShaderModel>
+    </FxCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -100,7 +103,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <Optimization>MaxSpeed</Optimization>
+      <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
@@ -112,38 +115,60 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="CameraSystem.cpp" />
+    <ClCompile Include="CollisionSystem.cpp" />
     <ClCompile Include="Engine.cpp" />
     <ClCompile Include="GraphicSystem.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MovementSystem.cpp" />
+    <ClCompile Include="QuadTree.cpp" />
     <ClCompile Include="SteeringBehaviourSystem.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ActorCollection.h" />
     <ClInclude Include="CameraSystem.h" />
     <ClInclude Include="CBufferTypes.h" />
+    <ClInclude Include="CollisionComponent.h" />
+    <ClInclude Include="CollisionShape.h" />
+    <ClInclude Include="CollisionSystem.h" />
     <ClInclude Include="CubeMesh.h" />
     <ClInclude Include="EActorType.h" />
     <ClInclude Include="EBufferType.h" />
+    <ClInclude Include="ECollisionShape.h" />
     <ClInclude Include="EComponentType.h" />
+    <ClInclude Include="EInputType.h" />
     <ClInclude Include="EMeshType.h" />
     <ClInclude Include="Engine.h" />
+    <ClInclude Include="EShaderType.h" />
     <ClInclude Include="ESteeringBehaviourState.h" />
     <ClInclude Include="GraphicSystem.h" />
     <ClInclude Include="HealthComponent.h" />
     <ClInclude Include="IComponent.h" />
+    <ClInclude Include="InputDescriptions.h" />
     <ClInclude Include="ISystems.h" />
     <ClInclude Include="MeshComponent.h" />
     <ClInclude Include="MovementComponent.h" />
     <ClInclude Include="MovementSystem.h" />
+    <ClInclude Include="QuadTree.h" />
+    <ClInclude Include="QuadTreeConstants.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="SteeringBehaviourComponent.h" />
     <ClInclude Include="SteeringBehaviourSystem.h" />
     <ClInclude Include="TransformComponent.h" />
     <ClInclude Include="Utility.h" />
+    <ClInclude Include="VertexTypes.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Test.hlsl">
+      <FileType>Document</FileType>
+    </Text>
   </ItemGroup>
   <ItemGroup>
     <Text Include="Shader.hlsl">
+      <FileType>Document</FileType>
+    </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="QuadTreeDebugShader.hlsl">
       <FileType>Document</FileType>
     </Text>
   </ItemGroup>

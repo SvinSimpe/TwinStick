@@ -1,23 +1,22 @@
-#pragma once
+﻿#pragma once
 
 #include <DirectXMath.h>
 #include <ctime>
 
 namespace GameGlobals
 {
-	constexpr size_t MAX_ACTORS = 2048;
+	constexpr size_t MAX_ACTORS = 32768;// 8192;
 
 	namespace WorldBounds
 	{
-		constexpr float X_MIN = -500.0f;
-		constexpr float X_MAX = 500.0f;
-		constexpr float Z_MIN = -200.0f;
-		constexpr float Z_MAX = 500.0f;;
+		constexpr float X_MIN = -1050.0f;
+		constexpr float X_MAX = 1050.0f;
+		constexpr float Z_MIN = -700.0f;
+		constexpr float Z_MAX = 1100.0f;;
 
 	}
 
 }
-
 
 namespace Resolution
 { 

@@ -9,6 +9,7 @@
 #include "MovementComponent.h"
 #include "HealthComponent.h"
 #include "SteeringBehaviourComponent.h"
+#include "CollisionComponent.h"
 
 
 struct ActorCollection
@@ -22,5 +23,5 @@ struct ActorCollection
 	std::vector<std::unique_ptr<HealthComponent>>				mHealthComponents;
 	std::vector<std::unique_ptr<MovementComponent>>				mMovementComponents;
 	std::vector<std::unique_ptr<SteeringBehaviourComponent>>	mSteeringBehaviorComponents;
-
+	std::vector<std::unique_ptr<CollisionComponent>>			mCollisionComponents;
 };
