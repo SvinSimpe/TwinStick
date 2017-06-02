@@ -2,10 +2,14 @@
 #include "Utility.h"
 #include <DirectXColors.h>
 #include "ActorCollection.h"
+#include "QuadTreeConstants.h"
+#include "VertexTypes.h"
+
 
 #pragma comment( lib, "d3dcompiler.lib" )
 #include <d3dcompiler.h>
 #include <fstream>
+
 
 
 using namespace DirectX;
@@ -146,45 +150,74 @@ bool GraphicSystem::InitializeDirectXComponents()
 	return true;
 }
 
-bool GraphicSystem::InitializeShaders()
+bool GraphicSystem::InitializeEffects()
+{
+	EffectDesc instancedEffect;
+	instancedEffect.inputType		= EInputType::Instanced;
+	instancedEffect.vertexShader	= nullptr;
+	instancedEffect.pixelShader		= nullptr;
+	instancedEffect.shaderType		= EShaderType::Instanced;
+	instancedEffect.shaderFile		= "Shader.hlsl";
+
+	if( !InitializeShaders( instancedEffect ) )
+		return false;
+	mEffects.push_back( instancedEffect );
+
+	EffectDesc debugEffect;
+	debugEffect.inputType		= EInputType::Debug;
+	debugEffect.vertexShader	= nullptr;
+	debugEffect.pixelShader		= nullptr;
+	debugEffect.shaderType		= EShaderType::Debug_Line;
+	debugEffect.shaderFile		= "QuadTreeDebugShader.hlsl";
+
+	if( !InitializeShaders( debugEffect ) )
+		return false;
+	mEffects.push_back( debugEffect );
+
+
+	mCurrentEffect = &instancedEffect;
+
+	return true;
+}
+
+bool GraphicSystem::InitializeShaders( EffectDesc& effect )
 {
 	ComPtr<ID3DBlob> vs = nullptr;
-	if ( CompileShader( "Shader.hlsl", "VertexShaderMain", "vs_5_0", nullptr, vs.GetAddressOf() ) )
+	if ( CompileShader( effect.shaderFile, "VertexShaderMain", "vs_5_0", nullptr, vs.GetAddressOf() ) )
 	{
 		HRESULT hr = S_OK;
 		if( SUCCEEDED( hr = mDevice->CreateVertexShader( vs->GetBufferPointer(),
 														 vs->GetBufferSize(),
 														nullptr,
-														mVertexShader.GetAddressOf() ) ) )
+														effect.vertexShader.GetAddressOf() ) ) )
 		{	
-			D3D11_INPUT_ELEMENT_DESC inputDesc[] = {				 
-				{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT,	0,  0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-				{ "NORMAL",	  0, DXGI_FORMAT_R32G32B32_FLOAT,	0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-				{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,		0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+			if( effect.inputType == EInputType::Instanced )
+			{ 
+				hr = mDevice->CreateInputLayout( InputDesc::Instanced,
+												ARRAYSIZE( InputDesc::Instanced ),
+												vs->GetBufferPointer(),
+												vs->GetBufferSize(),
+												effect.inputLayout.GetAddressOf() );
+			}
+			else if( effect.inputType == EInputType::Debug )
+			{ 
+				hr = mDevice->CreateInputLayout( InputDesc::Debug,
+												 ARRAYSIZE( InputDesc::Debug ),
+												 vs->GetBufferPointer(),
+												 vs->GetBufferSize(),
+												 effect.inputLayout.GetAddressOf() );
 
-				{ "WORLD",	  0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1,  0, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
-				{ "WORLD",	  1, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 16, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
-				{ "WORLD",	  2, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 32, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
-				{ "WORLD",	  3, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 48, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
-				{ "COLOR",	  0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 64, D3D11_INPUT_PER_INSTANCE_DATA, 1 } };
-
-			hr = mDevice->CreateInputLayout( inputDesc,
-											ARRAYSIZE( inputDesc ),
-											vs->GetBufferPointer(),
-											vs->GetBufferSize(),
-											mInputLayout.GetAddressOf() );
-
+			}
 		}
-
 
 		ComPtr<ID3DBlob> ps = nullptr;
 
-		if( CompileShader( "Shader.hlsl", "PixelShaderMain", "ps_5_0", nullptr, ps.GetAddressOf() ) )
+		if( CompileShader( effect.shaderFile, "PixelShaderMain", "ps_5_0", nullptr, ps.GetAddressOf() ) )
 		{
 			hr = mDevice->CreatePixelShader( ps->GetBufferPointer(),
 											ps->GetBufferSize(),
 											nullptr,
-											mPixelShader.GetAddressOf() );
+											effect.pixelShader.GetAddressOf() );
 
 		}	
 		else if( hr == E_FAIL )
@@ -239,22 +272,22 @@ void GraphicSystem::BeginFrame()
 	mDeviceContext->OMSetRenderTargets( 1, mRenderTargetView.GetAddressOf(), mDepthStencilView.Get() );
 	
 
-	UINT32 stride[2]				= { sizeof(Vertex32), sizeof(InstanceData) };
-	UINT32 offset[2]				= { 0, 0 };
-	ID3D11Buffer* buffersToSet[2]	= { mBuffers[static_cast<size_t>( EBufferType::Vertex )].Get() ,
-										mBuffers[static_cast<size_t>( EBufferType::Instance )].Get() };
-	mDeviceContext->IASetVertexBuffers( 0, 2, buffersToSet, stride, offset );
-	mDeviceContext->VSSetConstantBuffers( 0, 1, mBuffers[static_cast<size_t>( EBufferType::Frame )].GetAddressOf() );
-	
+	//UINT32 stride[2]				= { sizeof(Vertex32), sizeof(InstanceData) };
+	//UINT32 offset[2]				= { 0, 0 };
+	//ID3D11Buffer* buffersToSet[2]	= { mBuffers[static_cast<size_t>( EBufferType::Vertex )].Get() ,
+	//									mBuffers[static_cast<size_t>( EBufferType::Instance )].Get() };
+	//mDeviceContext->IASetVertexBuffers( 0, 2, buffersToSet, stride, offset );
+	//mDeviceContext->VSSetConstantBuffers( 0, 1, mBuffers[static_cast<size_t>( EBufferType::Frame )].GetAddressOf() );
+	//
 
-	mDeviceContext->RSSetState( mRasterizerState.Get() );
-	mDeviceContext->IASetInputLayout( mInputLayout.Get() );
-	mDeviceContext->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
+	//mDeviceContext->RSSetState( mRasterizerState.Get() );
+	//mDeviceContext->IASetInputLayout( mInputLayout.Get() );
+	//mDeviceContext->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
 
-
-	mDeviceContext->VSSetShader( mVertexShader.Get(), nullptr, 0 );
-	mDeviceContext->GSSetShader( nullptr, nullptr, 0 );
-	mDeviceContext->PSSetShader( mPixelShader.Get(), nullptr, 0 );
+	//
+	//mDeviceContext->VSSetShader( mCurrentEffect->vertexShader.Get(), nullptr, 0 );
+	//mDeviceContext->GSSetShader( nullptr, nullptr, 0 );
+	//mDeviceContext->PSSetShader( mCurrentEffect->pixelShader.Get(), nullptr, 0 );
 	
 }
 
@@ -269,8 +302,9 @@ void GraphicSystem::Render( const size_t numActiveActors )
 {
 	BeginFrame();
 
-	mDeviceContext->DrawInstanced( static_cast<UINT>( mCubeMesh->vertices.size() ),
-								   static_cast<UINT>( numActiveActors ), 0, 0 );
+	RenderInstanced( numActiveActors );
+	RenderDebug();
+
 
 	EndFrame();
 	
@@ -294,6 +328,51 @@ void GraphicSystem::SetViewport()
 
 	mDeviceContext->RSSetViewports( 1, &vp );
 	mDeviceContext->OMSetRenderTargets( 1, mRenderTargetView.GetAddressOf(), mDepthStencilView.Get() );
+
+}
+
+void GraphicSystem::RenderInstanced( const size_t numActiveActors )
+{
+	UINT32 stride[2]				= { sizeof(Vertex32), sizeof(InstanceData) };
+	UINT32 offset[2]				= { 0, 0 };
+	ID3D11Buffer* buffersToSet[2]	= { mBuffers[static_cast<size_t>( EBufferType::Vertex )].Get(),
+										mBuffers[static_cast<size_t>( EBufferType::Instance )].Get() };
+	mDeviceContext->IASetVertexBuffers( 0, 2, buffersToSet, stride, offset );
+	mDeviceContext->VSSetConstantBuffers( 0, 1, mBuffers[static_cast<size_t>( EBufferType::Frame )].GetAddressOf() );
+
+
+	mDeviceContext->RSSetState( mRasterizerState.Get() );
+	mDeviceContext->IASetInputLayout( mEffects[static_cast<size_t>( EShaderType::Instanced )].inputLayout.Get() );
+	mDeviceContext->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
+	
+	;
+	mDeviceContext->VSSetShader( mEffects[static_cast<size_t>( EShaderType::Instanced )].vertexShader.Get(), nullptr, 0 );
+	mDeviceContext->GSSetShader( nullptr, nullptr, 0 );
+	mDeviceContext->PSSetShader( mEffects[static_cast<size_t>( EShaderType::Instanced )].pixelShader.Get(), nullptr, 0 );
+
+	mDeviceContext->DrawInstanced( static_cast<UINT>( mCubeMesh->vertices.size() ),
+								   static_cast<UINT>( numActiveActors ), 0, 0 );
+}
+
+void GraphicSystem::RenderDebug()
+{
+	UINT32 stride[1]				= { sizeof(Vertex12) };
+	UINT32 offset[1]				= { 0 };
+	ID3D11Buffer* buffersToSet[1]	= { mBuffers[static_cast<size_t>( EBufferType::QuadTreeDebug )].Get() };
+
+	mDeviceContext->IASetVertexBuffers( 2, 1, buffersToSet, stride, offset );
+
+	mDeviceContext->IASetInputLayout( mEffects[static_cast<size_t>( EShaderType::Debug_Line )].inputLayout.Get() );
+	mDeviceContext->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP );
+
+	mDeviceContext->VSSetShader( mEffects[static_cast<size_t>( EShaderType::Debug_Line )].vertexShader.Get(), nullptr, 0 );
+	mDeviceContext->GSSetShader( nullptr, nullptr, 0 );
+	mDeviceContext->PSSetShader( mEffects[static_cast<size_t>( EShaderType::Debug_Line )].pixelShader.Get(), nullptr, 0 );
+
+	for( size_t i = 0; i < mQuadTreeVertices.size(); i+=5 )
+	{
+		mDeviceContext->Draw( 5, i );
+	}
 
 }
 
@@ -349,6 +428,23 @@ bool GraphicSystem::BuildInstanceBuffer()
 
 	if( FAILED( mDevice->CreateBuffer( &ibDesc, nullptr,
 									   mBuffers[static_cast<size_t>( EBufferType::Instance )].GetAddressOf() ) ) )
+		return false;
+
+	return true;
+}
+
+bool GraphicSystem::BuildQuadTreeDebugVBuffer()
+{
+	D3D11_BUFFER_DESC vbd;
+	vbd.ByteWidth			= sizeof(Vertex12) * static_cast<UINT>( pow( 5, QuadTreeConstants::MAX_LEVEL ) );
+	vbd.StructureByteStride = sizeof(Vertex12);
+	vbd.Usage				= D3D11_USAGE_DYNAMIC;
+	vbd.BindFlags			= D3D11_BIND_VERTEX_BUFFER;
+	vbd.CPUAccessFlags		= D3D11_CPU_ACCESS_WRITE;
+	vbd.MiscFlags			= 0;
+
+	if( FAILED( mDevice->CreateBuffer( &vbd, nullptr,
+									   mBuffers[static_cast<size_t>( EBufferType::QuadTreeDebug )].GetAddressOf() ) ) )
 		return false;
 
 	return true;
@@ -420,6 +516,35 @@ bool GraphicSystem::UpdateInstanceCBuffer( std::unique_ptr<ActorCollection>& act
 
 }
 
+bool GraphicSystem::UpdateQuadTreeVBuffer()
+{
+	D3D11_MAPPED_SUBRESOURCE mappedResource;
+	HRESULT hr = mDeviceContext->Map( mBuffers[static_cast<size_t>( EBufferType::QuadTreeDebug )].Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource );
+
+	if( SUCCEEDED( hr ) )
+	{
+		std::vector<Vertex12> vertices;
+		for( size_t i = 0; i < mQuadTreeVertices.size(); i++ )
+		{
+			Vertex12 v;
+			v.position.x = mQuadTreeVertices[i].x;
+			v.position.y = 0.0f;
+			v.position.z = mQuadTreeVertices[i].y;
+
+			vertices.push_back( v );
+		}
+
+		memcpy( mappedResource.pData, &vertices[0], sizeof(Vertex12) * vertices.size()  );
+
+
+		mDeviceContext->Unmap( mBuffers[static_cast<size_t>( EBufferType::QuadTreeDebug )].Get(), 0 );
+	}
+	else
+		return false;
+
+	return true;
+}
+
 GraphicSystem::GraphicSystem()
 {
 	mWindowHandle		= NULL;
@@ -448,7 +573,7 @@ bool GraphicSystem::Initialize( HWND& windowHandle )
 	if( !InitializeDirectXComponents() )
 		return false;
 
-	if( !InitializeShaders() )
+	if( !InitializeEffects() )
 		return false;
 
 	mCubeMesh = std::make_unique<CubeMesh>();
@@ -462,8 +587,16 @@ bool GraphicSystem::Initialize( HWND& windowHandle )
 	if( !BuildInstanceBuffer() )
 		return false;
 
+	if( !BuildQuadTreeDebugVBuffer() )
+		return false;
+
 	return true;
 
+}
+
+void GraphicSystem::SetQuadTreeVertices( std::vector<XMFLOAT2>& vertices )
+{
+	mQuadTreeVertices = vertices;	
 }
 
 bool GraphicSystem::Update( float deltaTime, std::unique_ptr<ActorCollection>& actors,
@@ -476,6 +609,9 @@ bool GraphicSystem::Update( float deltaTime, std::unique_ptr<ActorCollection>& a
 		return false;
 	
 	if( !UpdateInstanceCBuffer( actors, numActiveActors ) )
+		return false;
+
+	if( !UpdateQuadTreeVBuffer() )
 		return false;
 	
 	Render( numActiveActors );

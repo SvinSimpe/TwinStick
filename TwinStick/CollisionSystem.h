@@ -18,6 +18,7 @@ class CollisionSystem : public ISystems
 		CollisionSystem();
 		~CollisionSystem();
 
+		void GetQuadTreeVertices( std::vector<XMFLOAT2>& vertices );
 
 		// Inherited via ISystems
 		virtual bool Update( float deltaTime, std::unique_ptr<ActorCollection>& actors,

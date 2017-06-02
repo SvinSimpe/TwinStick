@@ -1,16 +1,8 @@
-#pragma once
+﻿#pragma once
 
-#include <DirectXMath.h>
+#include "VertexTypes.h"
 #include <vector>
 using namespace DirectX;
-
-struct Vertex32
-{
-	XMFLOAT3 position;
-	XMFLOAT3 normal;
-	XMFLOAT2 texCoord;
-
-};
 
 struct CubeMesh
 {

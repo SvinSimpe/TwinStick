@@ -1,6 +1,10 @@
 ﻿#pragma once
 
+#define Min(a,b)  (((a) < (b)) ? (a) : (b))
+#define Max(a,b)  (((a) > (b)) ? (a) : (b))
+
 #include "ECollisionShape.h"
+#include "Utility.h"
 #include <DirectXMath.h>
 using namespace DirectX;
 
@@ -103,16 +107,42 @@ namespace Intersection
 				 circle1.GetHalfExtentSq() + circle2.GetHalfExtentSq() );
 	}
 
+	//inline bool CircleVsAABB( const CircleCollisionShape& circle, 
+	//						  const BoxCollisionShape& box ) noexcept
+	//{
+	//	XMVECTOR centerToCenter = XMVector2Length( XMLoadFloat2( &circle.mCenter ) -
+	//											   XMLoadFloat2( &box.mCenter ) );
+	//	XMVECTOR boxHalfExtents = XMVectorSet( box.mWidth * 0.5f, box.mHeight * 0.5f,
+	//										   0.0f, 0.0f );
+	//	XMVECTOR closestPoint = XMVectorClamp( centerToCenter, -boxHalfExtents, boxHalfExtents );
+
+	//	float d =   XMVectorGetX( closestPoint - XMLoadFloat2( &circle.mCenter ) ) - circle.GetHalfExtent();
+	//	return circle.GetHalfExtent() < d;
+	//	//return circle.GetHalfExtent() < XMVectorGetX( closestPoint - XMLoadFloat2( &circle.mCenter ) );
+
+	//}
+
+	inline bool Point( const XMFLOAT2& point, 
+					   const BoxCollisionShape& box ) noexcept
+	{
+		return ( point.x < box.mPosition.x + box.mWidth &&
+				 point.x > box.mPosition.x &&
+				 point.y > box.mPosition.y - box.mHeight &&
+				 point.y < box.mPosition.y );
+
+	}
+
 	inline bool CircleVsAABB( const CircleCollisionShape& circle, 
 							  const BoxCollisionShape& box ) noexcept
 	{
-		XMVECTOR centerToCenter = XMVector2Length( XMLoadFloat2( &circle.mCenter ) -
-												   XMLoadFloat2( &box.mCenter ) );
-		XMVECTOR boxHalfExtents = XMVectorSet( box.mWidth * 0.5f, box.mHeight * 0.5f,
-											   0.0f, 0.0f );
-		XMVECTOR closestPoint = XMVectorClamp( centerToCenter, -boxHalfExtents, boxHalfExtents );
+		//float deltaX = circle.mPosition.x - Max( box.mPosition.x, Min( circle.mPosition.x, box.mPosition.x + box.mWidth ) );
+		//float deltaY = circle.mPosition.y - Max( box.mPosition.y, Min( circle.mPosition.y, box.mPosition.y + box.mHeight ) );
+		//
+		//return ( deltaX * deltaX + deltaY * deltaY ) < circle.GetHalfExtentSq();
 
-		return circle.GetHalfExtent() < XMVectorGetX( closestPoint - XMLoadFloat2( &circle.mCenter ) );
-
+		bool overlap = Point( circle.mCenter, box );
+		return overlap;
 	}
+
+	
 }

@@ -27,6 +27,10 @@ bool Engine::Update( float deltaTime )
 	if( !mCameraSystem->Update( deltaTime, mActors, mNumActiveActors, nullptr ) )
 		return false;
 
+	std::vector<XMFLOAT2> quadTreeVertices;
+	mCollisionSystem->GetQuadTreeVertices( quadTreeVertices );
+	mGraphicSystem->SetQuadTreeVertices( quadTreeVertices );
+
 	FrameData newFrameData = { mCameraSystem->GetViewMatrixTranspose(),
 		mCameraSystem->GetProjectionMatrixTranspose(),
 		mCameraSystem->GetCameraLocation() };
@@ -40,7 +44,7 @@ bool Engine::Update( float deltaTime )
 
 bool Engine::InitializeSystems()
 {
-	mCameraSystem = std::make_unique<CameraSystem>( XMFLOAT3( 0.0f, 200.0f, -450.0f ) );
+	mCameraSystem = std::make_unique<CameraSystem>( XMFLOAT3( 0.0f, 1550.0f, -1450.0f ) ); //-1650Z
 	if( !mCameraSystem )
 		return false;
 

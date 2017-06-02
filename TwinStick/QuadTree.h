@@ -4,20 +4,17 @@
 #include <vector>
 #include <DirectXMath.h>
 #include "CollisionComponent.h"
-#include <set>
+
 
 
 
 class QuadTree
 {
 	private:
-		static const unsigned int MAX_NODES_PER_QUAD	= 40;
-		static const unsigned int MAX_LEVEL				= 3;
-
 		BoxCollisionShape						mBounds;
 		size_t									mLevel;
 		std::vector<std::unique_ptr<QuadTree>>	mChildren;	
-		std::vector<CollisionComponent*>			mNodeList;
+		std::vector<CollisionComponent*>		mNodeList;
 
 		bool	mIsLeaf;
 

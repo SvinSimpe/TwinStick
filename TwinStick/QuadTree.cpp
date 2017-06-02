@@ -1,6 +1,7 @@
 ﻿#include "QuadTree.h"
-//#include <algorithm>
+#include "QuadTreeConstants.h"
 using namespace DirectX;
+using namespace QuadTreeConstants;
 
 void QuadTree::Split()
 {
@@ -122,8 +123,10 @@ void QuadTree::GetDebugVertices( std::vector<XMFLOAT2>& vertices ) const
 
 		vertices.push_back( upperLeft );
 		vertices.push_back( upperRight );
-		vertices.push_back( BottomLeft );
 		vertices.push_back( BottomRight );
+		vertices.push_back( BottomLeft );	
+		vertices.push_back( upperLeft );
+
 	}
 	else
 	{
@@ -131,7 +134,6 @@ void QuadTree::GetDebugVertices( std::vector<XMFLOAT2>& vertices ) const
 			child->GetDebugVertices( vertices );
 	}
 }
-
 
 // GetPossibleOverlaps
 /*

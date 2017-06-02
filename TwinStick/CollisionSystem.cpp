@@ -67,8 +67,7 @@ void CollisionSystem::CheckCollision( std::unique_ptr<ActorCollection>& actors, 
 			}
 		}
 	}
-	std::vector<XMFLOAT2> quadVertices;
-	mQuadTree->GetDebugVertices( quadVertices );
+
 
 
 	int k = 4;
@@ -91,11 +90,18 @@ CollisionSystem::CollisionSystem()
 CollisionSystem::~CollisionSystem()
 {}
 
+void CollisionSystem::GetQuadTreeVertices( std::vector<XMFLOAT2>& vertices )
+{
+	mQuadTree->GetDebugVertices( vertices );
+}
+
 bool CollisionSystem::Update( float deltaTime, std::unique_ptr<ActorCollection>& actors,
 							  size_t numActiveActors, void * systemSpecificInput )
 {
 	if( !actors )
 		return false;
+
+	mQuadTree->Clear();
 
 	for( size_t i = 0; i < numActiveActors; i++ )
 	{
@@ -110,7 +116,7 @@ bool CollisionSystem::Update( float deltaTime, std::unique_ptr<ActorCollection>&
 
 	CheckCollision( actors, numActiveActors );
 
-	mQuadTree->Clear();
+	
 
 	std::string s = std::to_string( mNumChecks );
 	#if _DEBUG

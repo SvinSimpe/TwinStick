@@ -13,7 +13,7 @@ int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdL
 		return 0;
 
 
-	for( size_t i = 0; i < 200; i++ )
+	for( size_t i = 0; i < 8192; i++ )
 	{
 		std::vector<std::unique_ptr<IComponent>> componentList;
 		std::unique_ptr<TransformComponent> transform = std::make_unique<TransformComponent>();
@@ -86,8 +86,9 @@ int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdL
 		if( i == 0 )
 		{ 
 			mesh->color = XMFLOAT4( 1.0f, 0.0f, 0.0f, 1.0f );
-			movement->speed = 20.0f;
+			movement->speed = 15.0f;
 			transform->location = XMFLOAT3( 100.0f, 0.0f, -200.0f );
+			transform->scale =XMFLOAT3( 8.0f, 10.0f, 8.0f );
 		}
 
 		steeringBehaviour->mass = XMVectorGetX( XMVector3Length( XMLoadFloat3( &transform->scale ) ) );
@@ -106,7 +107,6 @@ int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdL
 		engine->RequestActor( componentList );
 	}
 	
-
 	return engine->Run();
 
 }
