@@ -345,7 +345,7 @@ void GraphicSystem::RenderInstanced( const size_t numActiveActors )
 	mDeviceContext->IASetInputLayout( mEffects[static_cast<size_t>( EShaderType::Instanced )].inputLayout.Get() );
 	mDeviceContext->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
 	
-	;
+	
 	mDeviceContext->VSSetShader( mEffects[static_cast<size_t>( EShaderType::Instanced )].vertexShader.Get(), nullptr, 0 );
 	mDeviceContext->GSSetShader( nullptr, nullptr, 0 );
 	mDeviceContext->PSSetShader( mEffects[static_cast<size_t>( EShaderType::Instanced )].pixelShader.Get(), nullptr, 0 );

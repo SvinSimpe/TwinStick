@@ -5,7 +5,6 @@
 
 #include "ECollisionShape.h"
 #include "Utility.h"
-#include <DirectXMath.h>
 using namespace DirectX;
 
 struct CollisionShape
