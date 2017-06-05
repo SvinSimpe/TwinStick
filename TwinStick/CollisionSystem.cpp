@@ -44,7 +44,7 @@ void CollisionSystem::CheckCollision( std::unique_ptr<ActorCollection>& actors, 
 			CollisionComponent& comp = *actors->mCollisionComponents[i];
 			std::vector<CollisionComponent*> possibleOverlaps;
 
-			mQuadTree->GetOverlaps( possibleOverlaps, comp );
+			mQuadTree->GetPossibleOverlaps( possibleOverlaps, comp );
 
 			for( auto& node : possibleOverlaps )
 			{
